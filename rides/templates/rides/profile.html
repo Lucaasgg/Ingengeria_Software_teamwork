@@ -1,0 +1,48 @@
+{# templates/rides/profile.html #}
+{% extends "rides/base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+  <h1>My Account</h1>
+
+  {# Display any messages (success / error) #}
+  {% if messages %}
+    <ul class="messages">
+      {% for msg in messages %}
+        <li{% if msg.tags %} class="{{ msg.tags }}"{% endif %}>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <fieldset>
+      <legend>Personal info</legend>
+      {{ form.username.label_tag }} {{ form.username }}
+      {{ form.first_name.label_tag }} {{ form.first_name }}
+      {{ form.last_name.label_tag }} {{ form.last_name }}
+      {{ form.email.label_tag }} {{ form.email }}
+    </fieldset>
+
+    <fieldset>
+      <legend>Car ownership</legend>
+      {# This is your custom boolean field #}
+      <p>
+        {{ form.has_car }} 
+        {{ form.has_car.label_tag }}
+      </p>
+
+      {# Optionally render car fields only if has_car is checked.
+         You can control this in JS or simply show them always. #}
+      <div id="car-details">
+        {{ form.make.label_tag }} {{ form.make }}
+        {{ form.model.label_tag }} {{ form.model }}
+        {{ form.plate.label_tag }} {{ form.plate }}
+        {{ form.seats.label_tag }} {{ form.seats }}
+      </div>
+    </fieldset>
+
+    <button type="submit">Save changes</button>
+  </form>
+{% endblock %}

@@ -15,15 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # carpooling/urls.py
-from django.contrib.auth import views as auth_views
+
+
 from django.contrib import admin
 from django.urls import path, include
-
-# Force Django to load rides/admin.py and register your models
+from django.contrib.auth import views as auth_views
+from rides.views import SignupView, ProfileView
 import rides.admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('rides/', include('rides.urls', namespace='rides')),
+
+    # ----- Authentication URLs -----
+    path('accounts/signup/', SignupView.as_view(), name='signup'),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('accounts/profile/', ProfileView.as_view(), name='profile'),
+
+    # ----- Rides App URLs -----
+    path('rides/', include('rides.urls', namespace='rides')),
 ]
