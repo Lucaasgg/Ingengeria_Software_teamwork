@@ -1,20 +1,22 @@
-from django.shortcuts import render
+#rides/views.py
+
+
 from django.views.generic import ListView, DetailView
 from .models import Trip
 
 class TripListView(ListView):
     """
-    Displays a list of all upcoming trips.
+    Show a list of all upcoming (planned) trips.
     """
     model = Trip
-    template_name = 'rides/trip_list.html'   # you will create this template
+    template_name = 'rides/trip_list.html'
     context_object_name = 'trips'
-    queryset = Trip.objects.filter(status='P')  # only planned trips
+    queryset = Trip.objects.filter(status='P')
 
 class TripDetailView(DetailView):
     """
-    Shows the details for a single trip.
+    Show the full details of a single trip.
     """
     model = Trip
-    template_name = 'rides/trip_detail.html'  # you will create this template
+    template_name = 'rides/trip_detail.html'
     context_object_name = 'trip'

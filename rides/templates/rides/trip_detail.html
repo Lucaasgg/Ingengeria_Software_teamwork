@@ -1,7 +1,13 @@
-<h1>Trip Details</h1>
-<p><strong>Driver:</strong> {{ trip.driver }}</p>
-<p><strong>Route:</strong> {{ trip.route.origin }} → {{ trip.route.destination }}</p>
-<p><strong>Departure:</strong> {{ trip.departure }}</p>
-<p><strong>Seats Available:</strong> {{ trip.seats_available }}</p>
-<p><strong>Status:</strong> {{ trip.get_status_display }}</p>
-<a href="{% url 'rides:trip-list' %}">← Back to list</a>
+<!DOCTYPE html>
+<html>
+<head><title>Trip Details</title></head>
+<body>
+  <h1>Trip {{ trip.id }} Details</h1>
+  <p><strong>Driver:</strong> {{ trip.driver }}</p>
+  <p><strong>Route:</strong> {{ trip.route.origin }} → {{ trip.route.destination }}</p>
+  <p><strong>Departure:</strong> {{ trip.departure }}</p>
+  <p><strong>Seats Available:</strong> {{ trip.seats_available }}</p>
+  <p><strong>Status:</strong> {{ trip.get_status_display }}</p>
+  <p><a href="{% url 'rides:trip-list' %}">← Back to all trips</a></p>
+</body>
+</html>
