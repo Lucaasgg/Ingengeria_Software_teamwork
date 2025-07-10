@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Car Pooling{% endblock %}</title>
+</head>
+<body>
+  {# global messages block #}
+  {% if messages %}
+    <ul class="messages">
+      {% for msg in messages %}
+        <li{% if msg.tags %} class="{{ msg.tags }}"{% endif %}>
+          {{ msg }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {# page-specific content goes here #}
+  {% block content %}{% endblock %}
+</body>
+</html>
