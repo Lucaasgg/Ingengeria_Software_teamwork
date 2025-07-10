@@ -9,14 +9,7 @@
         <a href="{% url 'rides:trip-detail' trip.pk %}">
           {{ trip.route.origin }} → {{ trip.route.destination }} at {{ trip.departure|date:"Y-m-d H:i" }}
         </a>
-        {% if user.is_authenticated %}
-          <form action="{% url 'rides:trip-request' trip.pk %}" method="post" style="display:inline">
-            {% csrf_token %}
-            <button type="submit">Request a seat</button>
-          </form>
-        {% else %}
-          <a href="{% url 'login' %}">Log in</a> to request a seat.
-        {% endif %}
+        
       </li>
     {% empty %}
       <li>No trips available.</li>
