@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # carpooling/urls.py
-
+from django.contrib.auth import views as auth_views
 from django.contrib import admin
 from django.urls import path, include
 
@@ -25,4 +25,5 @@ import rides.admin
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rides/', include('rides.urls', namespace='rides')),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
 ]

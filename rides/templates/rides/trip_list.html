@@ -14,5 +14,13 @@
       <li>No trips available.</li>
     {% endfor %}
   </ul>
+  {% if user.is_authenticated %}
+  <form action="{% url 'rides:trip-request' trip.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Request a seat</button>
+  </form>
+{% else %}
+  <p><a href="{% url 'login' %}">Log in</a> to request a seat.</p>
+{% endif %}
 </body>
 </html>
