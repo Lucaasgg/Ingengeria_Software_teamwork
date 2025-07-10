@@ -6,7 +6,7 @@
   <form method="post">
     {% csrf_token %}
     <p>
-      <label for="{{ form.username.id_for_label }}">Email or Username:</label><br>
+      <label for="{{ form.username.id_for_label }}">Email:</label><br>
       {{ form.username }}
     </p>
     <p>

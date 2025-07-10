@@ -1,51 +1,67 @@
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import ListView, DetailView
-from django.views import View
-from django.contrib import messages
+# rides/views.py
+
+from django.shortcuts           import get_object_or_404, redirect, render
+from django.contrib             import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Trip, TripRequest
-from django.views.generic import TemplateView
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
-from django.contrib.auth.views import LoginView
-from .forms import SignupForm, EmailAuthenticationForm, ProfileForm
-from django.views.generic import FormView
+from django.views.generic       import ListView, DetailView, CreateView
+from django.views               import View
+from django.contrib.auth.views  import LoginView
+from django.urls                import reverse_lazy
+
+from .models  import Trip, TripRequest, Profile
+from .forms   import (
+    SignupForm,
+    EmailAuthenticationForm,
+    UserForm,
+    ProfileForm,
+)
+
 
 class TripListView(ListView):
     """
-    Show a list of all upcoming trips (status='P').
+    Lista todos los viajes planificados (status='P').
     """
-    model = Trip
-    template_name = 'rides/trip_list.html'
+    model               = Trip
+    template_name       = 'rides/trip_list.html'
     context_object_name = 'trips'
-    queryset = Trip.objects.filter(status='P')
+    queryset            = Trip.objects.filter(status='P')
+
 
 class TripDetailView(DetailView):
     """
-    Show details for a single Trip.
+    Detalle de un viaje, junto con un flag si el usuario
+    ya ha solicitado plaza.
     """
-    model = Trip
-    template_name = 'rides/trip_detail.html'
+    model               = Trip
+    template_name       = 'rides/trip_detail.html'
     context_object_name = 'trip'
+
+    def get_context_data(self, **kwargs):
+        ctx  = super().get_context_data(**kwargs)
+        user = self.request.user
+        ctx['already_requested'] = (
+            user.is_authenticated and
+            TripRequest.objects.filter(trip=self.object, passenger=user).exists()
+        )
+        return ctx
+
 
 class TripRequestView(LoginRequiredMixin, View):
     """
-    Handle a user POSTing to request a seat on a Trip.
-    Only logged-in users can post.
+    Gestiona la petición POST de solicitar plaza.
+    Evita duplicados y que el conductor se solicite a sí mismo.
     """
-    login_url = '/accounts/login/'
+    login_url          = '/accounts/login/'
     redirect_field_name = 'next'
 
     def post(self, request, pk):
-        # Fetch only planned trips
         trip = get_object_or_404(Trip, pk=pk, status='P')
 
-        # Prevent driver from requesting their own trip
         if trip.driver == request.user:
             messages.error(request, "You can’t request your own trip.")
             return redirect('rides:trip-detail', pk=pk)
 
-        # Create the TripRequest if it doesn’t exist
         req, created = TripRequest.objects.get_or_create(
             trip=trip,
             passenger=request.user,
@@ -58,30 +74,59 @@ class TripRequestView(LoginRequiredMixin, View):
             messages.info(request, "You’ve already requested a seat on this trip.")
 
         return redirect('rides:trip-detail', pk=pk)
-class ProfileView(LoginRequiredMixin, FormView):
-    template_name = 'rides/profile.html'
-    form_class    = ProfileForm
-    success_url   = reverse_lazy('profile')
 
-    def get_initial(self):
-        user = self.request.user
-        return {
-          'first_name': user.first_name,
-          'last_name':  user.last_name,
-          'email':      user.email,
-          'has_car':    hasattr(user, 'car'),
-        }
 
-    def form_valid(self, form):
-        form.save(self.request.user)
-        return super().form_valid(form)
-    
+@login_required
+def profile_view(request):
+    """
+    Función que muestra y procesa simultáneamente el UserForm
+    y el ProfileForm para que el usuario edite sus datos y coche.
+    """
+    # Garantiza que exista un Profile para este usuario
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        uform = UserForm(request.POST, instance=request.user)
+        pform = ProfileForm(request.POST, instance=profile)
+        if uform.is_valid() and pform.is_valid():
+            uform.save()
+            pform.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect('profile')         # debe coincidir con name="profile"
+    else:
+        uform = UserForm(instance=request.user)
+        pform = ProfileForm(instance=profile)
+
+    return render(request, 'rides/profile.html', {
+        'uform': uform,
+        'pform': pform,
+    })
+
+
+class ProfileView(View):
+    """
+    Envoltorio para poder usar as_view() en urls.py sin cambiar
+    la lógica de profile_view().
+    """
+    def get(self,  request, *args, **kwargs):
+        return profile_view(request)
+
+    def post(self, request, *args, **kwargs):
+        return profile_view(request)
+
 
 class SignupView(CreateView):
-    form_class = SignupForm
+    """
+    Registro de nuevos usuarios.
+    """
+    form_class    = SignupForm
     template_name = 'registration/signup.html'
-    success_url = reverse_lazy('login')
+    success_url   = reverse_lazy('login')
+
 
 class EmailLoginView(LoginView):
+    """
+    Login usando email en lugar de username.
+    """
     authentication_form = EmailAuthenticationForm
-    template_name = 'registration/login.html'
+    template_name       = 'registration/login.html'

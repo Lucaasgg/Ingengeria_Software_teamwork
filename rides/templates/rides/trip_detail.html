@@ -1,22 +1,55 @@
+{# templates/rides/trip_detail.html #}
 {% extends "rides/base.html" %}
-{% block title %}Trip {{ trip.id }} Details{% endblock %}
+{% block title %}
+  {{ trip.route.origin }} → {{ trip.route.destination }} Details
+{% endblock %}
 
 {% block content %}
-  <h1>Trip {{ trip.id }} Details</h1>
-  <p><strong>Driver:</strong> {{ trip.driver }}</p>
-  <p><strong>Route:</strong> {{ trip.route.origin }} → {{ trip.route.destination }}</p>
-  <p><strong>Departure:</strong> {{ trip.departure }}</p>
-  <p><strong>Seats Available:</strong> {{ trip.seats_available }}</p>
-  <p><strong>Status:</strong> {{ trip.get_status_display }}</p>
+  <div class="trip-detail-wrapper">
+    {# Heading #}
+    <h2>{{ trip.route.origin }} → {{ trip.route.destination }} Details</h2>
 
-  {% if user.is_authenticated %}
-    <form action="{% url 'rides:trip-request' trip.pk %}" method="post">
-      {% csrf_token %}
-      <button type="submit">Request a seat</button>
-    </form>
-  {% else %}
-    <p><a href="{% url 'login' %}">Log in</a> to request a seat.</p>
+    {# Two-column grid for labels and values #}
+    <div class="trip-info-grid">
+      <div class="field-label">When:</div>
+      <div class="field-value">{{ trip.departure|date:"F j, Y, g:i a" }}</div>
+
+      <div class="field-label">Seats Available:</div>
+      <div class="field-value">{{ trip.seats_available }}</div>
+
+      <div class="field-label">Driver:</div>
+      <div class="field-value">{{ trip.driver.username }}</div>
+
+      <div class="field-label">Status:</div>
+      <div class="field-value">{{ trip.get_status_display }}</div>
+    </div>
+
+    {# Action buttons #}
+    <div class="actions">
+      {% if user.is_authenticated %}
+        <form action="{% url 'rides:trip-request' trip.pk %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn">Request a Seat</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn">Log in to Request</a>
+      {% endif %}
+      <a href="{% url 'rides:trip-list' %}" class="btn btn-secondary">← Back to Trips</a>
+    </div>
+  </div>
+{% endblock %}
+{% block extra_js %}
+  {% if already_requested %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const overlay = document.getElementById('modalOverlay');
+        document.getElementById('modalTitle').textContent   = 'Already Requested';
+        document.getElementById('modalMessage').textContent = "You've already requested a seat on this trip.";
+        overlay.style.display = 'flex';
+        document.getElementById('modalClose').addEventListener('click', function() {
+          overlay.style.display = 'none';
+        });
+      });
+    </script>
   {% endif %}
-
-  <p><a href="{% url 'rides:trip-list' %}">← Back to all trips</a></p>
 {% endblock %}

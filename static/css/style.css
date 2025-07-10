@@ -1,107 +1,496 @@
-/* Reset & base */
+/* Base Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
 }
 
+/* Root Variables */
+:root {
+  --color-bg: #f0f2f5;
+  --color-primary: #1976d2;
+  --color-primary-light: #42a5f5;
+  --color-dark: #283593;
+  --color-text: #333;
+  --color-white: #fff;
+  --radius: 8px;
+  --transition: 0.3s ease;
+}
+
+/* Body */
 body {
-  background: #f5f6fa;
-  color: #333;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
   line-height: 1.6;
 }
 
-/* Container */
-.container {
-  max-width: 960px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Header */
+/* Header & Nav */
 header {
-  background: #2d3436;
-  color: #fff;
+  width: 100%;
+  background: var(--color-dark);
   padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 header .container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 2rem;
 }
-header a {
-  color: #fff;
+header .brand {
+  color: var(--color-white);
+  font-size: 2rem;
   text-decoration: none;
-  font-size: 1.25rem;
+  font-weight: bold;
 }
-
-/* Navigation */
 nav ul {
   list-style: none;
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
 }
 nav a {
-  color: #dfe6e9;
+  color: var(--color-white);
   text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition);
 }
 nav a:hover {
-  color: #ffffff;
+  color: var(--color-primary-light);
 }
 
-/* Main content */
-h1 {
-  margin-bottom: 1rem;
-  font-size: 2rem;
-  color: #2d3436;
-}
-p, li {
-  margin-bottom: 0.75rem;
-}
-
-/* Buttons & Forms */
-button, .btn {
-  background: #0984e3;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-button:hover, .btn:hover {
-  background: #74b9ff;
-}
-
-form p {
-  margin-bottom: 1rem;
-}
-form label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: bold;
-}
-form input[type="text"],
-form input[type="email"],
-form input[type="password"],
-form input[type="datetime-local"],
-form select {
+/* Main Container */
+main.container {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 2rem 4rem;
 }
 
 /* Footer */
 footer {
+  background: var(--color-dark);
+  color: var(--color-white);
+}
+footer .container {
   text-align: center;
-  padding: 1rem 0;
-  background: #2d3436;
-  color: #fff;
-  margin-top: 2rem;
-  font-size: 0.875rem;
+  padding: 1.5rem 2rem;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.hero h1 {
+  font-size: 2.5rem;
+  color: var(--color-dark);
+}
+.hero .lead {
+  font-size: 1.25rem;
+  margin: 1rem 0 2rem;
+}
+.hero .actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Buttons */
+.btn,
+.cta a {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+}
+.btn:hover,
+.cta a:hover {
+  background: var(--color-primary-light);
+}
+
+/* Features */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+.feature {
+  text-align: center;
+  padding: 1rem;
+}
+.feature h3 {
+  margin-bottom: 0.5rem;
+  color: var(--color-dark);
+}
+.feature p {
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+/* About */
+.about {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: var(--color-white);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.about h2 {
+  margin-bottom: 1rem;
+  color: var(--color-dark);
+}
+.about p {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1rem;
+}
+
+/* Testimonials – professional two-column layout */
+.testimonials {
+  margin: 4rem 0;
+  text-align: center;
+}
+.testimonials h2 {
+  margin-bottom: 2rem;
+  color: var(--color-dark);
+  font-size: 2rem;
+}
+/* Make blockquotes side-by-side */
+.testimonials blockquote {
+  display: inline-block !important;
+  vertical-align: top !important;
+  width: 45% !important;
+  min-width: 260px !important;
+  margin: 0 2.5% 1.5rem !important;
+}
+
+/* Background & text color */
+.testimonials blockquote {
+  background: var(--color-dark) !important;
+  color: var(--color-white) !important;
+  padding: 1.5rem !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  position: relative !important;
+}
+/* ====== Testimonials: two wide blue cards ====== */
+.testimonials .testimonial-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+/* Each quote becomes a block with ample width */
+.testimonials .testimonial-grid blockquote {
+  background: var(--color-dark) !important;
+  color: var(--color-white) !important;
+  flex: 1 1 80%;            /* try to take 80% of row */
+  max-width: 800px;         /* never grow past 800px */
+  min-width: 300px;         /* stack below this */
+  padding: 1.5rem 2rem 3rem; /* extra right padding, bottom room */
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  position: relative !important;
+  white-space: normal !important; /* allow wrapping */
+}
+
+/* Quote text */
+.testimonials .testimonial-grid blockquote p {
+  font-style: italic !important;
+  margin-bottom: 2rem !important; /* room for footer */
+  line-height: 1.5 !important;
+}
+
+/* Testimonial author styling */
+.testimonials .testimonial-grid blockquote footer {
+  display: block;               /* ensure it’s its own line */
+  font-style: italic;           /* italic text */
+  text-align: right;            /* aligned to the right */
+  margin-top: 0.5rem;           /* small gap above */
+  color: var(--color-primary-light); /* accent color */
+}
+
+
+
+/* Call-to-Action */
+.cta {
+  text-align: center;
+  margin: 4rem 0;
+}
+.cta h2 {
+  margin-bottom: 1rem;
+  color: var(--color-dark);
+}
+.cta p {
+  margin-bottom: 1.5rem;
+  color: var(--color-text);
+}
+.cta a.btn {
+  margin-top: 1rem;
+}
+
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-box {
+  background: var(--color-white);
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.modal-box h3 {
+  margin-bottom: 1rem;
+  color: var(--color-dark);
+}
+.modal-box p {
+  margin-bottom: 1.5rem;
+}
+/* Hide the “already requested” info message */
+.messages li.info {
+  display: none;
+}
+ul.messages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* any <li> in .messages that isn’t tagged “message” gets hidden */
+ul.messages li:not(.message) {
+  display: none;
+}
+/* —————————————————————————————— */
+/* Trip List – card style with hover  */
+/* —————————————————————————————— */
+.trip-list-wrapper {
+  margin: 2rem 0;
+}
+.trip-list-wrapper ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+}
+.trip-list-wrapper li a {
+  display: block;
+  background: var(--color-white);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  color: var(--color-dark);
+  text-decoration: none;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+.trip-list-wrapper li a:hover {
+  background: var(--color-bg);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+/* If you wrap the route text in an <h3> */
+.trip-list-wrapper li a h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--color-dark);
+}
+/* And the date/time in a <p> or <time> */
+.trip-list-wrapper li a p,
+.trip-list-wrapper li a time {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* Trip List Grid & Cards */
+.trip-grid {
+  display: grid;
+  grid-template-columns: 1fr;    /* single column */
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.trip-card {
+  background: var(--color-white);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.trip-info h2 {
+  margin-bottom: 0.75rem;
+  color: var(--color-dark);
+  font-size: 1.25rem;
+}
+
+.trip-info p {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.btn-request {
+  margin-top: 1rem;
+  align-self: start;
+}
+/* Trip Detail: info in two columns */
+.trip-detail-wrapper {
+  background: var(--color-white);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin: 2rem 0;
+}
+.trip-detail-wrapper h2 {
+  margin-bottom: 1.5rem;
+  color: var(--color-dark);
+}
+/* grid for labels and values */
+.trip-info-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  row-gap: 0.75rem;
+  column-gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.field-label {
+  font-weight: bold;
+  color: var(--color-primary);
+}
+.field-value {
+  color: var(--color-text);
+}
+
+/* Action buttons */
+.trip-detail-wrapper .actions {
+  display: flex;
+  gap: 1rem;
+}
+.trip-detail-wrapper .actions .btn {
+  flex: 1;
+}
+.trip-detail-wrapper .actions .btn-secondary {
+  background: var(--color-primary-light);
+}
+.trip-detail-wrapper .actions .btn-secondary:hover {
+  background: var(--color-primary);
+}
+.profile-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+.profile-page h1 {
+  font-size: 2rem;
+  color: var(--color-dark);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Section cards */
+.trip-detail-wrapper {
+  background: var(--color-white);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+.trip-detail-wrapper h2 {
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+}
+
+/* Layout the form fields */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.form-group {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+.form-group.full-width {
+  flex: 1 1 100%;
+}
+
+/* Inputs styling */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="number"],
+.form-group select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color var(--transition);
+}
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Car fields container (hidden by JS until “Yes”) */
+.car-fields {
+  margin-top: 1rem;
+  display: none;
+}
+
+/* Flash messages */
+.messages {
+  list-style: none;
+  margin-bottom: 1.5rem;
+}
+.messages .message {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+}
+.messages .message.success {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+.messages .message.error {
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* Center the Save button */
+.profile-page .btn {
+  display: block;
+  margin: 1.5rem auto 0;
 }

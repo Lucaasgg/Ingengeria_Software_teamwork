@@ -1,18 +1,25 @@
+{# templates/rides/trip_list.html #}
 {% extends "rides/base.html" %}
 {% block title %}Available Trips{% endblock %}
 
 {% block content %}
   <h1>Available Trips</h1>
-  <ul>
-    {% for trip in trips %}
-      <li>
-        <a href="{% url 'rides:trip-detail' trip.pk %}">
-          {{ trip.route.origin }} → {{ trip.route.destination }} at {{ trip.departure|date:"Y-m-d H:i" }}
-        </a>
-        
-      </li>
-    {% empty %}
-      <li>No trips available.</li>
-    {% endfor %}
-  </ul>
+
+  {% if trips %}
+    <div class="trip-grid">
+      {% for trip in trips %}
+        <div class="trip-card">
+          <div class="trip-info">
+            <h2>{{ trip.route.origin }} → {{ trip.route.destination }}</h2>
+            <p><strong>When:</strong> {{ trip.departure|date:"F j, Y, g:i a" }}</p>
+          </div>
+          <a href="{% url 'rides:trip-detail' trip.pk %}" class="btn btn-request">
+            Details
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="trip-list-empty">No trips available at the moment.</p>
+  {% endif %}
 {% endblock %}

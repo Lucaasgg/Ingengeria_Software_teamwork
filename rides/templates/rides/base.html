@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+
   <header>
     <div class="container">
-      <a href="{% url 'rides:trip-list' %}">CarPooling</a>
+      <a href="{% url 'home' %}" class="brand">CarPooling</a>
       <nav>
         <ul>
           <li><a href="{% url 'rides:trip-list' %}">Trips</a></li>
@@ -41,5 +42,16 @@
       &copy; {{ now.year }} CarPooling Inc.
     </div>
   </footer>
+
+  <!-- Modal markup, hidden by default -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <h3 id="modalTitle">Notice</h3>
+      <p id="modalMessage"></p>
+      <button id="modalClose" class="btn">OK</button>
+    </div>
+  </div>
+
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -2,7 +2,9 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 # Reference the active User model (could be django.contrib.auth or a custom one)
 User = settings.AUTH_USER_MODEL
 
@@ -113,3 +115,14 @@ class TripRequest(models.Model):
     def __str__(self):
         return f"{self.passenger} → Trip {self.trip.id} [{self.get_status_display()}]"
 
+class Profile(models.Model):
+    user        = models.OneToOneField(User, on_delete=models.CASCADE)
+    has_car     = models.BooleanField(default=False)
+    make        = models.CharField(max_length=50, blank=True)
+    model       = models.CharField(max_length=50, blank=True)
+    plate       = models.CharField(max_length=20, blank=True)
+    seats       = models.PositiveSmallIntegerField(null=True, blank=True)
+
+@receiver(post_save, sender=User)
+def ensure_profile_exists(sender, instance, **kwargs):
+    Profile.objects.get_or_create(user=instance)

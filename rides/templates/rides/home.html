@@ -2,15 +2,59 @@
 {% block title %}Welcome to CarPooling{% endblock %}
 
 {% block content %}
-  <h1>Welcome to CarPooling</h1>
-  <p>Connect drivers with extra seats to passengers looking for a ride.</p>
-  <p>
-    <a class="btn" href="{% url 'rides:trip-list' %}">View Trips</a>
-    {% if user.is_authenticated %}
-      <a class="btn" href="{% url 'profile' %}">Your Profile</a>
-    {% else %}
-      <a class="btn" href="{% url 'signup' %}">Get Started</a>
-    {% endif %}
-  </p>
-{% endblock %}
+  <section class="hero">
+    <h1>CarPooling</h1>
+    <p class="lead">
+      Connecting drivers with empty seats to passengers looking for a comfortable, eco-friendly ride.
+    </p>
+    <div class="actions">
+      <a href="{% url 'rides:trip-list' %}" class="btn">Browse Trips</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="btn">My Profile</a>
+      {% else %}
+        <a href="{% url 'signup' %}" class="btn">Get Started</a>
+      {% endif %}
+    </div>
+  </section>
 
+  <section class="features">
+    <div class="feature">
+      <h3>Safe &amp; Reliable</h3>
+      <p>All drivers are vetted and rated by passengers—your safety is our top priority.</p>
+    </div>
+    <div class="feature">
+      <h3>Eco-Friendly</h3>
+      <p>Share rides, reduce emissions, and save on fuel. Good for your wallet and the planet.</p>
+    </div>
+    <div class="feature">
+      <h3>Easy Booking</h3>
+      <p>Find and reserve a seat in just a few clicks—no complicated forms or hidden fees.</p>
+    </div>
+  </section>
+
+  <section class="about">
+    <h2>About Us</h2>
+    <p>
+      Founded in 2023, CarPooling is on a mission to make daily commutes and inter-city travel more affordable and sustainable.
+      We believe in building communities of trusted drivers and passengers, and in making every trip count toward a greener future.
+    </p>
+  </section>
+
+  <section class="testimonials">
+    <h2>What Our Users Say</h2>
+    <blockquote>
+      “I’ve saved over $200 in gas this month by sharing rides with colleagues—CarPooling makes it so easy!”
+      <footer>— Maria Rossi, Rome</footer>
+    </blockquote>
+    <blockquote>
+      “As a driver, I love meeting new people and offsetting my commute costs. Highly recommend!”
+      <footer>— Luca Bianchi, Milan</footer>
+    </blockquote>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to join?</h2>
+    <p>Whether you have extra seats or need a ride, CarPooling is here to connect you.</p>
+    <a href="{% url 'signup' %}" class="btn">Create Your Account</a>
+  </section>
+{% endblock %}

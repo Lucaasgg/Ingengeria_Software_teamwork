@@ -1,48 +1,90 @@
-{# templates/rides/profile.html #}
 {% extends "rides/base.html" %}
-{% block title %}My Profile{% endblock %}
+{% load static %}
+{% block title %}My Account{% endblock %}
 
 {% block content %}
-  <h1>My Account</h1>
+  <div class="profile-page">
 
-  {# Display any messages (success / error) #}
-  {% if messages %}
-    <ul class="messages">
-      {% for msg in messages %}
-        <li{% if msg.tags %} class="{{ msg.tags }}"{% endif %}>{{ msg }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
 
-  <form method="post">
-    {% csrf_token %}
+    <h1>My Account</h1>
 
-    <fieldset>
-      <legend>Personal info</legend>
-      {{ form.username.label_tag }} {{ form.username }}
-      {{ form.first_name.label_tag }} {{ form.first_name }}
-      {{ form.last_name.label_tag }} {{ form.last_name }}
-      {{ form.email.label_tag }} {{ form.email }}
-    </fieldset>
+    <form method="post" novalidate>
+      {% csrf_token %}
 
-    <fieldset>
-      <legend>Car ownership</legend>
-      {# This is your custom boolean field #}
-      <p>
-        {{ form.has_car }} 
-        {{ form.has_car.label_tag }}
-      </p>
-
-      {# Optionally render car fields only if has_car is checked.
-         You can control this in JS or simply show them always. #}
-      <div id="car-details">
-        {{ form.make.label_tag }} {{ form.make }}
-        {{ form.model.label_tag }} {{ form.model }}
-        {{ form.plate.label_tag }} {{ form.plate }}
-        {{ form.seats.label_tag }} {{ form.seats }}
+      <div class="trip-detail-wrapper">
+        <h2>Personal Info</h2>
+        <div class="form-row">
+          <div class="form-group">
+            {{ uform.first_name.label_tag }}<br>
+            {{ uform.first_name }}
+          </div>
+          <div class="form-group">
+            {{ uform.last_name.label_tag }}<br>
+            {{ uform.last_name }}
+          </div>
+          <div class="form-group full-width">
+            {{ uform.email.label_tag }}<br>
+            {{ uform.email }}
+          </div>
+        </div>
       </div>
-    </fieldset>
 
-    <button type="submit">Save changes</button>
-  </form>
+      <div class="trip-detail-wrapper">
+        <h2>Car Ownership</h2>
+
+        <div class="form-group">
+          {{ pform.has_car.label_tag }}<br>
+          {{ pform.has_car }}
+        </div>
+
+        <div id="car-fields" class="car-fields">
+          <div class="form-row">
+            <div class="form-group">
+              {{ pform.make.label_tag }}<br>
+              {{ pform.make }}
+            </div>
+            <div class="form-group">
+              {{ pform.model.label_tag }}<br>
+              {{ pform.model }}
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              {{ pform.plate.label_tag }}<br>
+              {{ pform.plate }}
+            </div>
+            <div class="form-group">
+              {{ pform.seats.label_tag }}<br>
+              {{ pform.seats }}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Save changes</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const radios   = document.querySelectorAll('input[name="has_car"]');
+      const carBox   = document.getElementById('car-fields');
+
+      function toggleCarFields() {
+        // choicefield devuelve "True" o "False"
+        const val = document.querySelector('input[name="has_car"]:checked').value;
+        carBox.style.display = (val === 'True') ? 'block' : 'none';
+      }
+
+      radios.forEach(r => r.addEventListener('change', toggleCarFields));
+      toggleCarFields();
+    });
+  </script>
 {% endblock %}

@@ -30,7 +30,8 @@ urlpatterns = [
     path('accounts/signup/', SignupView.as_view(),      name='signup'),
     path('accounts/login/',  EmailLoginView.as_view(),  name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('accounts/profile/', ProfileView.as_view(),    name='profile'),
+   path('accounts/profile/', ProfileView.as_view(), name='profile'),
+
 
     # --- Rides URLs under /rides/ ---
     path('rides/', include('rides.urls', namespace='rides')),
