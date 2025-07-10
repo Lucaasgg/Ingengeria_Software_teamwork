@@ -8,7 +8,8 @@ from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.auth.views import LoginView
-from .forms import SignupForm, EmailAuthenticationForm
+from .forms import SignupForm, EmailAuthenticationForm, ProfileForm
+from django.views.generic import FormView
 
 class TripListView(ListView):
     """
@@ -57,8 +58,23 @@ class TripRequestView(LoginRequiredMixin, View):
             messages.info(request, "You’ve already requested a seat on this trip.")
 
         return redirect('rides:trip-detail', pk=pk)
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, FormView):
     template_name = 'rides/profile.html'
+    form_class    = ProfileForm
+    success_url   = reverse_lazy('profile')
+
+    def get_initial(self):
+        user = self.request.user
+        return {
+          'first_name': user.first_name,
+          'last_name':  user.last_name,
+          'email':      user.email,
+          'has_car':    hasattr(user, 'car'),
+        }
+
+    def form_valid(self, form):
+        form.save(self.request.user)
+        return super().form_valid(form)
     
 
 class SignupView(CreateView):

@@ -1,0 +1,16 @@
+{% extends "rides/base.html" %}
+{% block title %}Welcome to CarPooling{% endblock %}
+
+{% block content %}
+  <h1>Welcome to CarPooling</h1>
+  <p>Connect drivers with extra seats to passengers looking for a ride.</p>
+  <p>
+    <a class="btn" href="{% url 'rides:trip-list' %}">View Trips</a>
+    {% if user.is_authenticated %}
+      <a class="btn" href="{% url 'profile' %}">Your Profile</a>
+    {% else %}
+      <a class="btn" href="{% url 'signup' %}">Get Started</a>
+    {% endif %}
+  </p>
+{% endblock %}
+

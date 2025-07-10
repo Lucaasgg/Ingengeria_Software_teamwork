@@ -3,20 +3,43 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}Car Pooling{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-  {# global messages block #}
-  {% if messages %}
-    <ul class="messages">
-      {% for msg in messages %}
-        <li{% if msg.tags %} class="{{ msg.tags }}"{% endif %}>
-          {{ msg }}
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+  <header>
+    <div class="container">
+      <a href="{% url 'rides:trip-list' %}">CarPooling</a>
+      <nav>
+        <ul>
+          <li><a href="{% url 'rides:trip-list' %}">Trips</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Log out</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}">Log in</a></li>
+            <li><a href="{% url 'signup' %}">Sign up</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  {# page-specific content goes here #}
-  {% block content %}{% endblock %}
+  <main class="container">
+    {% if messages %}
+      <ul class="messages">
+        {% for msg in messages %}
+          <li class="{{ msg.tags }}">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="container">
+      &copy; {{ now.year }} CarPooling Inc.
+    </div>
+  </footer>
 </body>
 </html>

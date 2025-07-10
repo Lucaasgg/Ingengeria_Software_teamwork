@@ -16,22 +16,22 @@ Including another URLconf
 """
 # carpooling/urls.py
 
-
+from django.views.generic import TemplateView
 from django.contrib import admin
 from django.urls import path, include
+from rides.views import SignupView, EmailLoginView, ProfileView
 from django.contrib.auth import views as auth_views
-from rides.views import SignupView, ProfileView
-import rides.admin
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name='rides/home.html'), name='home'),
     path('admin/', admin.site.urls),
 
-    # ----- Authentication URLs -----
-    path('accounts/signup/', SignupView.as_view(), name='signup'),
-    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    # --- Authentication URLs under /accounts/ ---
+    path('accounts/signup/', SignupView.as_view(),      name='signup'),
+    path('accounts/login/',  EmailLoginView.as_view(),  name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('accounts/profile/', ProfileView.as_view(), name='profile'),
+    path('accounts/profile/', ProfileView.as_view(),    name='profile'),
 
-    # ----- Rides App URLs -----
+    # --- Rides URLs under /rides/ ---
     path('rides/', include('rides.urls', namespace='rides')),
 ]

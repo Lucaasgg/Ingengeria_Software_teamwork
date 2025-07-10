@@ -2,11 +2,19 @@
 {% block title %}Log In{% endblock %}
 
 {% block content %}
-<h1>Log In</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Log In</button>
-</form>
-<p>New? <a href="{% url 'signup' %}">Sign up</a>.</p>
+  <h1>Log In</h1>
+  <form method="post">
+    {% csrf_token %}
+    <p>
+      <label for="{{ form.username.id_for_label }}">Email or Username:</label><br>
+      {{ form.username }}
+    </p>
+    <p>
+      <label for="{{ form.password.id_for_label }}">Password:</label><br>
+      {{ form.password }}
+    </p>
+    <button type="submit">Log In</button>
+  </form>
+
+  <p>New? <a href="{% url 'signup' %}">Sign up</a>.</p>
 {% endblock %}

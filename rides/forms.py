@@ -3,6 +3,32 @@ from django.contrib.auth.models import User
 from .models import Car
 from django.contrib.auth.forms import AuthenticationForm
 from django import forms
+# rides/forms.py
+from django import forms
+from django.contrib.auth import get_user_model
+from .models import Car
+
+User = get_user_model()
+
+class ProfileForm(forms.ModelForm):
+    has_car = forms.BooleanField(required=False, label="I have a car")
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+    def save(self, user, commit=True):
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name  = self.cleaned_data['last_name']
+        user.email      = self.cleaned_data['email']
+        if commit:
+            user.save()
+        # Handle Car creation/deletion:
+        if self.cleaned_data['has_car']:
+            Car.objects.get_or_create(owner=user)
+        else:
+            Car.objects.filter(owner=user).delete()
+        return user
 
 class SignupForm(forms.ModelForm):
     """
