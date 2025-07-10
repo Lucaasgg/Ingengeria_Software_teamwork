@@ -1,0 +1,12 @@
+<h1>Available Trips</h1>
+<ul>
+  {% for trip in trips %}
+    <li>
+      <a href="{% url 'rides:trip-detail' trip.pk %}">
+        {{ trip.route.origin }} → {{ trip.route.destination }} on {{ trip.departure|date:"Y-m-d H:i" }}
+      </a>
+    </li>
+  {% empty %}
+    <li>No trips available.</li>
+  {% endfor %}
+</ul>
