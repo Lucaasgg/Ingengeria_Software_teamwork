@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Environment
+.venv/
+
+# Django database
+db.sqlite3
+
+# VSCode settings
+.vscode/
+
+# macOS
+.DS_Store
