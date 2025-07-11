@@ -6,6 +6,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile
 from .models import Car
 from django.contrib.auth import get_user_model
+from .models import Trip
+
+
+
+
 
 User = get_user_model()
 
@@ -119,3 +124,12 @@ class EmailAuthenticationForm(AuthenticationForm):
     Override the login form to ask for Email + Password.
     """
     username = forms.EmailField(label="Email", widget=forms.EmailInput)
+
+class TripCreateForm(forms.ModelForm):
+    class Meta:
+        model = Trip
+        exclude = ['driver', 'status', 'created_at']
+        fields = ['route', 'departure', 'seats_available']  
+        widgets = {
+            'departure': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }

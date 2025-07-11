@@ -16,7 +16,7 @@ from .forms import (
     UserForm,
     ProfileForm,
 )
-
+from .forms import TripCreateForm
 
 class TripListView(ListView):
     """
@@ -133,3 +133,24 @@ class EmailLoginView(LoginView):
     """
     authentication_form = EmailAuthenticationForm
     template_name       = 'registration/login.html'
+
+@login_required
+def create_trip(request):
+    profile = request.user.profile
+    if not profile.has_car:
+        messages.error(request, "You must have a car to create a trip.")
+        return redirect('profile')
+
+    if request.method == 'POST':
+        form = TripCreateForm(request.POST)
+        if form.is_valid():
+            trip = form.save(commit=False)
+            trip.driver = request.user
+            trip.save()
+            messages.success(request, "Trip created successfully!")
+            return redirect('rides:trip-list')  # Cambia según tu namespace
+    else:
+        form = TripCreateForm()
+
+    return render(request, 'rides/trip_create.html', {'form': form})
+

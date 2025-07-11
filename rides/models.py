@@ -69,16 +69,13 @@ class Trip(models.Model):
         return f"Trip {self.id} by {self.driver} on {dt}"
 
     def clean(self):
-        """
-        Ensure:
-         - departure is in the future
-         - seats_available does not exceed driver's car capacity
-        """
+        from django.core.exceptions import ValidationError
+        if not self.driver_id:
+            return 
         if self.departure <= timezone.now():
-            from django.core.exceptions import ValidationError
             raise ValidationError("Departure time must be in the future.")
+    
         if hasattr(self.driver, 'car') and self.seats_available > self.driver.car.seats:
-            from django.core.exceptions import ValidationError
             raise ValidationError("Seats available exceed your car's capacity.")
 
 

@@ -8,12 +8,10 @@
       Connecting drivers with empty seats to passengers looking for a comfortable, eco-friendly ride.
     </p>
     <div class="actions">
+      
+      <a href="{% url 'rides:trip-create' %}" class="btn">Create a Trip</a>
       <a href="{% url 'rides:trip-list' %}" class="btn">Browse Trips</a>
-      {% if user.is_authenticated %}
-        <a href="{% url 'profile' %}" class="btn">My Profile</a>
-      {% else %}
-        <a href="{% url 'signup' %}" class="btn">Get Started</a>
-      {% endif %}
+      
     </div>
   </section>
 

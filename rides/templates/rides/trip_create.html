@@ -1,0 +1,24 @@
+{% extends "rides/base.html" %}
+{% block title %}Create Trip{% endblock %}
+{% block content %}
+  <div class="create-trip-container">
+  <h1>Create a Trip</h1>
+  <form method="post" class="create-trip-form">
+    {% csrf_token %}
+    <div class="trip-form-row">
+      <label for="{{ form.route.id_for_label }}">Route:</label>
+      {{ form.route }}
+    </div>
+    <div class="trip-form-row">
+      <label for="{{ form.departure.id_for_label }}">Departure:</label>
+      {{ form.departure }}
+    </div>
+    <div class="trip-form-row">
+      <label for="{{ form.seats_available.id_for_label }}">Seats available:</label>
+      {{ form.seats_available }}
+    </div>
+    <button type="submit" class="create-trip-btn">Create Trip</button>
+  </form>
+</div>
+
+{% endblock %}

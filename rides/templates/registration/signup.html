@@ -37,10 +37,18 @@
       {{ form.password.label_tag }}
       {{ form.password }}
     </div>
-    <fieldset class="form-group" id="has-car-fieldset">
-      <legend>Do you have a car?</legend>
-      {{ form.has_car }}
-    </fieldset>
+    <div class="form-group">
+  <label>Do you have a car?</label>
+  <div class="radio-inline">
+    <label>
+      <input type="radio" name="has_car" value="True"> Yes
+    </label>
+    <label>
+      <input type="radio" name="has_car" value="False"> No
+    </label>
+  </div>
+</div>
+
     <div id="car-details" style="display:none;">
       <div class="form-group">
         {{ form.make.label_tag }}

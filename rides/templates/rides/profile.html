@@ -39,10 +39,17 @@
       <div class="trip-detail-wrapper">
         <h2>Car Ownership</h2>
 
-        <div class="form-group">
-          {{ pform.has_car.label_tag }}<br>
-          {{ pform.has_car }}
-        </div>
+        <div class="car-ownership-group">
+  <label>
+    <input type="radio" name="has_car" value="True" {% if has_car %}checked{% endif %}>
+    Yes
+  </label>
+  <label>
+    <input type="radio" name="has_car" value="False" {% if not has_car %}checked{% endif %}>
+    No
+  </label>
+</div>
+
 
         <div id="car-fields" class="car-fields">
           <div class="form-row">
