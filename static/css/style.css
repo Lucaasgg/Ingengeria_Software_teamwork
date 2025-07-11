@@ -494,3 +494,135 @@ ul.messages li:not(.message) {
   display: block;
   margin: 1.5rem auto 0;
 }
+/* -------------------------------------------------------
+   Signup Page
+------------------------------------------------------- */
+.signup-container {
+  max-width: 500px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: var(--color-white);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+.signup-container h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-dark);
+}
+
+.signup-container .form-group,
+.signup-container fieldset {
+  margin-bottom: 1.25rem;
+}
+
+.signup-container label,
+.signup-container legend {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.signup-container input[type="text"],
+.signup-container input[type="email"],
+.signup-container input[type="password"],
+.signup-container input[type="number"] {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color var(--transition);
+}
+
+.signup-container input:focus {
+  border-color: var(--color-primary-light);
+  outline: none;
+}
+
+.signup-container fieldset {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: #fafafa;
+}
+
+.signup-container input[type="radio"] {
+  margin-right: 0.5rem;
+  transform: scale(1.1);
+}
+
+#car-details {
+  display: none; /* se mostrará via JS */
+  margin-top: 1rem;
+}
+
+.signup-container .btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.signup-container .btn:hover {
+  background: var(--color-primary-light);
+}
+
+.signup-container .small {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+/* ==== Style for “Do you have a car?” ==== */
+.signup-container fieldset {
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  background: #fafafa;
+}
+
+.signup-container fieldset legend {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-dark);
+}
+
+.signup-container fieldset label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.signup-container fieldset input[type="radio"] {
+  margin-right: 0.5rem;
+  accent-color: var(--color-primary);
+}
+
+/* ==== Style for the Log in link under the button ==== */
+.signup-container .small {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.signup-container .small a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+.signup-container .small a:hover {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+}
