@@ -1,9 +1,11 @@
 # rides/forms.py
-
+from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile
+from .models import Car
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -48,48 +50,39 @@ class ProfileForm(forms.ModelForm):
         return self.cleaned_data['has_car'] == 'True'
 
 
+
 class SignupForm(forms.ModelForm):
     """
-    User registers with: first_name, last_name, email (as username), password,
-    and optionally car details (make, model, plate, seats).
+    Form for user registration, including car details if applicable.
     """
     password = forms.CharField(widget=forms.PasswordInput)
-    HAS_CAR_CHOICES = [
-        ('True',  'Yes'),
-        ('False', 'No'),
-    ]
-    has_car = forms.ChoiceField(
-        label="Do you have a car?",
-        choices=HAS_CAR_CHOICES,
-        widget=forms.RadioSelect
-    )
-
-    # Car detail fields (only saved if has_car == True)
-    make  = forms.CharField(max_length=50, required=False)
+    make = forms.CharField(max_length=50, required=False)
     model = forms.CharField(max_length=50, required=False)
     plate = forms.CharField(max_length=15, required=False)
     seats = forms.IntegerField(min_value=1, required=False)
+    HAS_CAR_CHOICES = [
+    ('True', 'Yes'),
+    ('False', 'No'),
+]
+    has_car = forms.ChoiceField(
+    choices=HAS_CAR_CHOICES,
+    widget=forms.RadioSelect,
+    label="Do you have a car?"
+)
 
     class Meta:
-        model  = User
+        model = User
         fields = ['first_name', 'last_name', 'email']
 
     def clean(self):
         cleaned = super().clean()
-        has_car = cleaned.get('has_car') == 'True'
-        if has_car:
-            # require all car fields
-            for fld in ('make','model','plate','seats'):
+        if cleaned.get('has_car'):
+            for fld in ('make', 'model', 'plate', 'seats'):
                 if not cleaned.get(fld):
                     self.add_error(fld, "This field is required if you have a car.")
         return cleaned
 
-    def clean_has_car(self):
-        # convierte el string a booleano
-        return self.cleaned_data['has_car'] == 'True'
-
     def save(self, commit=True):
-        # creamos el usuario
         user = User(
             username=self.cleaned_data['email'],
             first_name=self.cleaned_data['first_name'],
@@ -99,16 +92,26 @@ class SignupForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
-            # si tiene coche, lo guardamos
+            # Crear o actualizar Profile asociado
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.has_car = self.cleaned_data['has_car']
             if self.cleaned_data['has_car']:
-                Car.objects.create(
-                    owner=user,
-                    make=self.cleaned_data['make'],
-                    model=self.cleaned_data['model'],
-                    plate=self.cleaned_data['plate'],
-                    seats=self.cleaned_data['seats'],
-                )
+                profile.make = self.cleaned_data['make']
+                profile.model = self.cleaned_data['model']
+                profile.plate = self.cleaned_data['plate']
+                profile.seats = self.cleaned_data['seats']
+            else:
+                profile.make = ''
+                profile.model = ''
+                profile.plate = ''
+                profile.seats = None
+            profile.save()
         return user
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("A user with this email already exists.")
+        return email
 
 
 class EmailAuthenticationForm(AuthenticationForm):

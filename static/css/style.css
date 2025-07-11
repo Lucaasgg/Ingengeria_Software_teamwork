@@ -497,132 +497,135 @@ ul.messages li:not(.message) {
 /* -------------------------------------------------------
    Signup Page
 ------------------------------------------------------- */
+/* Contenedor general del formulario de registro */
 .signup-container {
-  max-width: 500px;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: var(--color-white);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    background: #fff;
+    max-width: 480px;
+    margin: 48px auto 0 auto;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px #0002;
+    padding: 36px 42px 28px 42px;
 }
 
 .signup-container h1 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: var(--color-dark);
+    font-size: 2.2rem;
+    margin-bottom: 1.8rem;
+    text-align: center;
+    color: #1b2173;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
-.signup-container .form-group,
-.signup-container fieldset {
-  margin-bottom: 1.25rem;
+.form-group {
+    margin-bottom: 20px;
 }
 
-.signup-container label,
-.signup-container legend {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: var(--color-dark);
+.form-group label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 7px;
+    color: #252b5b;
 }
 
-.signup-container input[type="text"],
-.signup-container input[type="email"],
-.signup-container input[type="password"],
-.signup-container input[type="number"] {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: var(--radius);
-  font-size: 1rem;
-  transition: border-color var(--transition);
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 11px 10px;
+    border-radius: 6px;
+    border: 1px solid #d2d5e6;
+    background: #f7f8fa;
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 2px;
+    transition: border 0.2s;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus {
+    border: 1.5px solid #233396;
+    outline: none;
 }
 
-.signup-container input:focus {
-  border-color: var(--color-primary-light);
-  outline: none;
+.radio-group label {
+    font-weight: 600;
+    margin-bottom: 7px;
 }
 
-.signup-container fieldset {
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: var(--radius);
-  background: #fafafa;
+.radio-inline {
+    display: flex;
+    gap: 32px;
+    margin-top: 5px;
+}
+.radio-inline label {
+    font-weight: 400;
+    margin-right: 12px;
+    color: #444b85;
+    cursor: pointer;
 }
 
-.signup-container input[type="radio"] {
-  margin-right: 0.5rem;
-  transform: scale(1.1);
+input[type="radio"] {
+    accent-color: #233396;
+    margin-right: 4px;
+    vertical-align: -2px;
 }
 
-#car-details {
-  display: none; /* se mostrará via JS */
-  margin-top: 1rem;
+#car-fields {
+    margin-top: 14px;
+    border-top: 1px solid #f0f1f5;
+    padding-top: 18px;
 }
 
-.signup-container .btn {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  background: var(--color-primary);
-  color: var(--color-white);
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background var(--transition);
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: #233396;
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 7px;
+    margin-top: 24px;
+    font-size: 1.09rem;
+    letter-spacing: 0.2px;
+    transition: background 0.18s;
+}
+.btn-primary:hover {
+    background: #3548c0;
+    cursor: pointer;
 }
 
-.signup-container .btn:hover {
-  background: var(--color-primary-light);
+.login-link {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #4953a5;
+    font-size: 1rem;
 }
 
-.signup-container .small {
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #555;
-}
-/* ==== Style for “Do you have a car?” ==== */
-.signup-container fieldset {
-  border: 1px solid #ddd;
-  border-radius: var(--radius);
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-  background: #fafafa;
+.login-link a {
+    color: #233396;
+    text-decoration: underline;
+    font-weight: 700;
+    margin-left: 3px;
 }
 
-.signup-container fieldset legend {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: var(--color-dark);
+@media (max-width: 600px) {
+    .signup-container {
+        max-width: 98vw;
+        padding: 18px 4vw;
+    }
 }
-
-.signup-container fieldset label {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 2rem;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.signup-container fieldset input[type="radio"] {
-  margin-right: 0.5rem;
-  accent-color: var(--color-primary);
-}
-
-/* ==== Style for the Log in link under the button ==== */
-.signup-container .small {
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 0.9rem;
-}
-.signup-container .small a {
-  color: var(--color-primary);
-  text-decoration: none;
+.alert {
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 0.5em;
   font-weight: 500;
-  transition: color var(--transition);
 }
-.signup-container .small a:hover {
-  color: var(--color-primary-light);
-  text-decoration: underline;
+.alert-danger {
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
 }
+

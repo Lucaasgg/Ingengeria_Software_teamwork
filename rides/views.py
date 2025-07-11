@@ -1,16 +1,16 @@
 # rides/views.py
 
-from django.shortcuts           import get_object_or_404, redirect, render
-from django.contrib             import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic       import ListView, DetailView, CreateView
-from django.views               import View
-from django.contrib.auth.views  import LoginView
-from django.urls                import reverse_lazy
-
-from .models  import Trip, TripRequest, Profile
-from .forms   import (
+from django.views.generic import ListView, DetailView, CreateView
+from django.views import View
+from django.contrib.auth.views import LoginView
+from django.urls   import reverse_lazy
+from django.contrib.auth import login, get_backends
+from .models import Trip, TripRequest, Profile
+from .forms import (
     SignupForm,
     EmailAuthenticationForm,
     UserForm,
@@ -116,17 +116,20 @@ class ProfileView(View):
 
 
 class SignupView(CreateView):
-    """
-    Registro de nuevos usuarios.
-    """
-    form_class    = SignupForm
+    form_class = SignupForm
     template_name = 'registration/signup.html'
-    success_url   = reverse_lazy('login')
+    success_url = reverse_lazy('profile')  
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        
+        user = self.object  
+        login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
+        return response
 
 class EmailLoginView(LoginView):
     """
-    Login usando email en lugar de username.
+    Login using email and password.
     """
     authentication_form = EmailAuthenticationForm
     template_name       = 'registration/login.html'
