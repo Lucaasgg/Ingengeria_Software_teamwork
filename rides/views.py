@@ -10,7 +10,7 @@ from django.views import View
 from django.contrib.auth.views import LoginView
 from django.urls   import reverse_lazy
 from django.contrib.auth import login, get_backends
-from .models import Trip, TripRequest, Profile
+from .models import Trip, TripRequest, Profile, Notification
 from .forms import (
     SignupForm,
     EmailAuthenticationForm,
@@ -147,9 +147,20 @@ def create_trip(request):
 
 @login_required
 def my_trips(request):
-    # All trips where the logged-in user is the driver
-    trips = Trip.objects.filter(driver=request.user).order_by('-departure')
-    return render(request, 'rides/my_trips.html', {'trips': trips})
+    # Trips where the user is the driver
+    as_driver = Trip.objects.filter(driver=request.user).order_by('-departure')
+    
+    # Trips where the user is an accepted passenger
+    passenger_requests = TripRequest.objects.filter(
+        passenger=request.user, status='A'
+    ).select_related('trip')
+    as_passenger = [tr.trip for tr in passenger_requests]
+
+    return render(request, 'rides/my_trips.html', {
+        'trips_as_driver': as_driver,
+        'trips_as_passenger': as_passenger,
+    })
+
 
 @login_required
 def update_trip_status(request, trip_id):
@@ -160,20 +171,28 @@ def update_trip_status(request, trip_id):
             trip.status = status
             trip.save()
             messages.success(request, "Trip status updated.")
+            
+            if status == 'A':  # 'A' para Aborted
+                accepted_requests = trip.requests.filter(status='A')
+                for req in accepted_requests:
+                    Notification.objects.create(
+                        user=req.passenger,
+                        message=f"The trip {trip.route} has been cancelled."
+                    )
         else:
             messages.error(request, "Invalid status.")
-    return redirect('my-trips')
+    return redirect('rides:my-trips')
 
 
 @login_required
 def manage_participation_request(request, request_id):
-    # Only the driver can manage requests for their trip
     req = get_object_or_404(
         TripRequest,
         id=request_id,
-        trip__driver=request.user  # Double underscore to traverse relation
+        trip__driver=request.user  # Only the driver can manage
     )
-    action = request.POST.get('action')
+    action = request.POST.get('action')  # 'accept' or 'reject'
+
     if action == 'accept' and req.status == 'P':
         if req.trip.seats_available > 0:
             req.status = 'A'
@@ -181,10 +200,26 @@ def manage_participation_request(request, request_id):
             req.trip.save()
             req.save()
             messages.success(request, "Passenger accepted.")
+            # Notificación de aceptación
+            Notification.objects.create(
+                user=req.passenger,
+                message=f"Your request for trip {req.trip.route} has been accepted."
+            )
         else:
             messages.error(request, "No seats available!")
     elif action == 'reject' and req.status == 'P':
         req.status = 'R'
         req.save()
         messages.success(request, "Passenger rejected.")
+        # Notificación de rechazo
+        Notification.objects.create(
+            user=req.passenger,
+            message=f"Your request for trip {req.trip.route} has been rejected."
+        )
+
     return redirect('rides:my-trips')
+
+@login_required
+def notifications_view(request):
+    notifications = request.user.notifications.order_by('-created_at')
+    return render(request, 'rides/notifications.html', {'notifications': notifications})

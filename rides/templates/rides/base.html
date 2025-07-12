@@ -13,7 +13,7 @@
       <a href="{% url 'home' %}" class="brand">CarPooling</a>
       <nav>
         <ul>
-          <li><a href="{% url 'rides:trip-list' %}">Trips</a></li>
+          <li><a href="{% url 'rides:notifications' %}">Notifications</a></li>
           {% if user.is_authenticated %}
           <li><a href="{% url 'rides:my-trips' %}">My Trips</a></li>
             <li><a href="{% url 'profile' %}">Profile</a></li>

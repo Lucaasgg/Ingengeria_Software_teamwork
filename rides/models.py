@@ -107,3 +107,12 @@ class Profile(models.Model):
 @receiver(post_save, sender=User)
 def ensure_profile_exists(sender, instance, **kwargs):
     Profile.objects.get_or_create(user=instance)
+    
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"To {self.user}: {self.message[:40]}"

@@ -15,4 +15,6 @@ urlpatterns = [
     path('mytrips/', views.my_trips, name='my-trips'),
     path('trips/<int:trip_id>/update-status/', views.update_trip_status, name='update-trip-status'),
     path('requests/<int:request_id>/manage/', views.manage_participation_request, name='manage-participation-request'),
+    path('notifications/', views.notifications_view, name='notifications'),
+
 ]

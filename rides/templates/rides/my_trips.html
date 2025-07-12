@@ -1,56 +1,199 @@
 {% extends "rides/base.html" %}
 {% block title %}My Trips{% endblock %}
+
 {% block content %}
-<h1 style="text-align:center;">My Trips (As Driver)</h1>
-{% for trip in trips %}
-<div class="trip-card">
-  <h2>Route: {{ trip.route }}</h2>
-  <p><b>Departure:</b> {{ trip.departure }}</p>
-  <p><b>Status:</b> {{ trip.get_status_display }}</p>
-  <p><b>Seats available:</b> {{ trip.seats_available }}</p>
+<h1 style="text-align:center;">My Trips</h1>
 
-  {# Cambiado: namespace rides en la url #}
-  <form method="post" action="{% url 'rides:update-trip-status' trip.id %}" style="display:inline;">
-    {% csrf_token %}
-    <label for="status">Change status:</label>
-    <select name="status">
-        {% for value, label in trip.STATUS_CHOICES %}
+<!-- =================== AS DRIVER =================== -->
+<h2 style="margin-top:30px;">As Driver</h2>
+{% if trips_as_driver %}
+  {% for trip in trips_as_driver %}
+    <div class="trip-card">
+      <h3>Route: {{ trip.route }}</h3>
+      <p><b>Departure:</b> {{ trip.departure }}</p>
+      <p><b>Status:</b> {{ trip.get_status_display }}</p>
+      <p><b>Seats available:</b> {{ trip.seats_available }}</p>
+      <!-- Cambiar estado del viaje -->
+      <form method="post" action="{% url 'rides:update-trip-status' trip.id %}" style="display:inline;">
+        {% csrf_token %}
+        <label for="status">Change status:</label>
+        <select name="status">
+          {% for value, label in trip.STATUS_CHOICES %}
             <option value="{{ value }}" {% if trip.status == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Save</button>
-  </form>
-
-  <h4>Participation Requests:</h4>
-{% if trip.requests.all %}
-  <table>
-    <thead>
-      <tr>
-        <th>Passenger</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for req in trip.requests.all %}
-      <tr>
-        <td>{{ req.passenger.get_full_name }} ({{ req.passenger.email }})</td>
-        <td>{{ req.get_status_display }}</td>
-        <td>
-          {% if req.status == 'P' %}
-            <form method="post" action="{% url 'rides:manage-participation-request' req.id %}" style="display:inline;">{% csrf_token %}
-              <button name="action" value="accept" class="btn btn-sm">Accept</button>
-              <button name="action" value="reject" class="btn btn-sm">Reject</button>
-            </form>
-          {% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+          {% endfor %}
+        </select>
+        <button type="submit">Save</button>
+      </form>
+      <!-- Tabla de participation requests -->
+      <h4>Participation Requests:</h4>
+      {% if trip.requests.all %}
+        <table>
+          <thead>
+            <tr>
+              <th>Passenger</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for req in trip.requests.all %}
+            <tr>
+              <td>{{ req.passenger.get_full_name }} ({{ req.passenger.email }})</td>
+              <td>{{ req.get_status_display }}</td>
+              <td>
+                {% if req.status == 'P' %}
+                  <form method="post" action="{% url 'rides:manage-participation-request' req.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button name="action" value="accept" class="btn btn-sm">Accept</button>
+                    <button name="action" value="reject" class="btn btn-sm">Reject</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No participation requests yet.</p>
+      {% endif %}
+    </div>
+  {% endfor %}
 {% else %}
-  <p>No participation requests yet.</p>
+  <p>You have no trips as driver.</p>
 {% endif %}
-</div>
-{% endfor %}
+
+<!-- =================== AS PASSENGER =================== -->
+<h2 style="margin-top:40px;">As Passenger</h2>
+{% if trips_as_passenger %}
+  {% for trip in trips_as_passenger %}
+    <div class="trip-card">
+      <h3>Route: {{ trip.route }}</h3>
+      <p><b>Departure:</b> {{ trip.departure }}</p>
+      <p><b>Status:</b> {{ trip.get_status_display }}</p>
+      <p><b>Seats available:</b> {{ trip.seats_available }}</p>
+      <p><b>Driver:</b> {{ trip.driver.get_full_name|default:trip.driver.username }}</p>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>You have no trips as passenger.</p>
+{% endif %}
+<style>
+/* --- Dedicated My Trips Page Styles --- */
+.my-trips-container {
+    margin-top: 25px;
+    margin-bottom: 40px;
+}
+
+.my-trips-container h1 {
+    font-weight: 900;
+    color: #26328b;
+    margin-bottom: 2.2rem;
+}
+
+.trip-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(38, 50, 139, 0.09);
+    margin: 30px auto 35px auto;
+    padding: 32px 40px 22px 40px;
+    max-width: 900px;
+    transition: box-shadow 0.2s;
+    border-left: 7px solid #26328b;
+    position: relative;
+}
+
+.trip-card h2 {
+    color: #26328b;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.trip-card p, .trip-card label {
+    font-size: 1.07rem;
+    margin: 7px 0 2px 0;
+}
+
+.trip-card form {
+    margin-bottom: 10px;
+    margin-top: 7px;
+}
+
+.trip-card select, .trip-card button {
+    font-size: 1.05rem;
+    padding: 6px 12px;
+    margin-left: 4px;
+    border-radius: 6px;
+    border: 1px solid #c2cbe6;
+}
+
+.trip-card button {
+    background: #26328b;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    margin-left: 7px;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+.trip-card button:hover {
+    background: #1d2366;
+}
+
+/* Table of participation requests */
+.trip-card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    margin-bottom: 5px;
+}
+
+.trip-card th, .trip-card td {
+    text-align: left;
+    padding: 10px 8px 10px 0;
+    font-size: 1rem;
+}
+
+.trip-card th {
+    color: #26328b;
+    font-size: 1.08rem;
+    font-weight: 800;
+    background: #e9ecfa;
+    border-radius: 4px;
+}
+
+.trip-card tr:nth-child(even) {
+    background: #f8f9fb;
+}
+
+.trip-card tr:hover {
+    background: #eef1fd;
+}
+
+.trip-card td {
+    vertical-align: middle;
+}
+
+.trip-card .btn-sm {
+    font-size: 0.98rem;
+    padding: 5px 13px;
+    margin-left: 0px;
+    margin-right: 5px;
+}
+
+/* Responsive for mobile/tablet */
+@media (max-width: 650px) {
+    .trip-card {
+        padding: 14px 5vw;
+        max-width: 98vw;
+    }
+    .trip-card h2 {
+        font-size: 1.07rem;
+    }
+    .trip-card th, .trip-card td, .trip-card label, .trip-card p {
+        font-size: 0.96rem;
+    }
+}
+</style>
 {% endblock %}

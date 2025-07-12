@@ -1,0 +1,14 @@
+{% extends "rides/base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<h1>Notifications</h1>
+<ul>
+  {% for n in notifications %}
+    <li style="{% if not n.is_read %}font-weight:bold;{% endif %}">
+      {{ n.message }} <small>({{ n.created_at|date:"Y-m-d H:i" }})</small>
+    </li>
+  {% empty %}
+    <li>No notifications yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
