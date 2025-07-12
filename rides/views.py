@@ -1,5 +1,6 @@
 # rides/views.py
 
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -19,20 +20,20 @@ from .forms import (
 from .forms import TripCreateForm
 
 class TripListView(ListView):
-    """
-    Lista todos los viajes planificados (status='P').
-    """
-    model               = Trip
-    template_name       = 'rides/trip_list.html'
+    model = Trip
+    template_name = 'rides/trip_list.html'
     context_object_name = 'trips'
-    queryset            = Trip.objects.filter(status='P')
+
+    def get_queryset(self):
+        qs = Trip.objects.filter(status='P')
+        if self.request.user.is_authenticated:
+            qs = qs.exclude(driver=self.request.user)
+        return qs
+
 
 
 class TripDetailView(DetailView):
-    """
-    Detalle de un viaje, junto con un flag si el usuario
-    ya ha solicitado plaza.
-    """
+    
     model               = Trip
     template_name       = 'rides/trip_detail.html'
     context_object_name = 'trip'
@@ -48,10 +49,7 @@ class TripDetailView(DetailView):
 
 
 class TripRequestView(LoginRequiredMixin, View):
-    """
-    Gestiona la petición POST de solicitar plaza.
-    Evita duplicados y que el conductor se solicite a sí mismo.
-    """
+    
     login_url          = '/accounts/login/'
     redirect_field_name = 'next'
 
@@ -78,11 +76,7 @@ class TripRequestView(LoginRequiredMixin, View):
 
 @login_required
 def profile_view(request):
-    """
-    Función que muestra y procesa simultáneamente el UserForm
-    y el ProfileForm para que el usuario edite sus datos y coche.
-    """
-    # Garantiza que exista un Profile para este usuario
+   
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
@@ -92,7 +86,7 @@ def profile_view(request):
             uform.save()
             pform.save()
             messages.success(request, "Your profile has been updated.")
-            return redirect('profile')         # debe coincidir con name="profile"
+            return redirect('profile')
     else:
         uform = UserForm(instance=request.user)
         pform = ProfileForm(instance=profile)
@@ -104,10 +98,7 @@ def profile_view(request):
 
 
 class ProfileView(View):
-    """
-    Envoltorio para poder usar as_view() en urls.py sin cambiar
-    la lógica de profile_view().
-    """
+    
     def get(self,  request, *args, **kwargs):
         return profile_view(request)
 
@@ -154,3 +145,46 @@ def create_trip(request):
 
     return render(request, 'rides/trip_create.html', {'form': form})
 
+@login_required
+def my_trips(request):
+    # All trips where the logged-in user is the driver
+    trips = Trip.objects.filter(driver=request.user).order_by('-departure')
+    return render(request, 'rides/my_trips.html', {'trips': trips})
+
+@login_required
+def update_trip_status(request, trip_id):
+    trip = get_object_or_404(Trip, id=trip_id, driver=request.user)
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        if status in dict(Trip.STATUS_CHOICES):
+            trip.status = status
+            trip.save()
+            messages.success(request, "Trip status updated.")
+        else:
+            messages.error(request, "Invalid status.")
+    return redirect('my-trips')
+
+
+@login_required
+def manage_participation_request(request, request_id):
+    # Only the driver can manage requests for their trip
+    req = get_object_or_404(
+        TripRequest,
+        id=request_id,
+        trip__driver=request.user  # Double underscore to traverse relation
+    )
+    action = request.POST.get('action')
+    if action == 'accept' and req.status == 'P':
+        if req.trip.seats_available > 0:
+            req.status = 'A'
+            req.trip.seats_available -= 1
+            req.trip.save()
+            req.save()
+            messages.success(request, "Passenger accepted.")
+        else:
+            messages.error(request, "No seats available!")
+    elif action == 'reject' and req.status == 'P':
+        req.status = 'R'
+        req.save()
+        messages.success(request, "Passenger rejected.")
+    return redirect('rides:my-trips')

@@ -31,13 +31,14 @@ from .models import Profile
 
 class ProfileForm(forms.ModelForm):
     HAS_CAR_CHOICES = [
-        (True,  'Yes'),
-        (False, 'No'),
+        ('True',  'Yes'),
+        ('False', 'No'),
     ]
-    has_car = forms.ChoiceField(
+    has_car = forms.TypedChoiceField(
         choices=HAS_CAR_CHOICES,
         widget=forms.RadioSelect,
-        label="Do you have a car?"
+        label="Do you have a car?",
+        coerce=lambda x: x == 'True'
     )
 
     class Meta:
@@ -50,30 +51,23 @@ class ProfileForm(forms.ModelForm):
             'seats': forms.NumberInput(attrs={'min':1, 'max':8}),
         }
 
-    def clean_has_car(self):
-        # convierte el string 'True' / 'False' a booleano
-        return self.cleaned_data['has_car'] == 'True'
-
 
 
 class SignupForm(forms.ModelForm):
-    """
-    Form for user registration, including car details if applicable.
-    """
     password = forms.CharField(widget=forms.PasswordInput)
     make = forms.CharField(max_length=50, required=False)
     model = forms.CharField(max_length=50, required=False)
     plate = forms.CharField(max_length=15, required=False)
     seats = forms.IntegerField(min_value=1, required=False)
     HAS_CAR_CHOICES = [
-    ('True', 'Yes'),
-    ('False', 'No'),
-]
+        ('True', 'Yes'),
+        ('False', 'No'),
+    ]
     has_car = forms.ChoiceField(
-    choices=HAS_CAR_CHOICES,
-    widget=forms.RadioSelect,
-    label="Do you have a car?"
-)
+        choices=HAS_CAR_CHOICES,
+        widget=forms.RadioSelect,
+        label="Do you have a car?"
+    )
 
     class Meta:
         model = User
@@ -81,7 +75,8 @@ class SignupForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
-        if cleaned.get('has_car'):
+        # SOLO si has_car == 'True', exige los campos del coche
+        if cleaned.get('has_car') == 'True':
             for fld in ('make', 'model', 'plate', 'seats'):
                 if not cleaned.get(fld):
                     self.add_error(fld, "This field is required if you have a car.")
@@ -99,8 +94,8 @@ class SignupForm(forms.ModelForm):
             user.save()
             # Crear o actualizar Profile asociado
             profile, created = Profile.objects.get_or_create(user=user)
-            profile.has_car = self.cleaned_data['has_car']
-            if self.cleaned_data['has_car']:
+            profile.has_car = self.cleaned_data['has_car'] == 'True'
+            if self.cleaned_data['has_car'] == 'True':
                 profile.make = self.cleaned_data['make']
                 profile.model = self.cleaned_data['model']
                 profile.plate = self.cleaned_data['plate']
@@ -112,11 +107,13 @@ class SignupForm(forms.ModelForm):
                 profile.seats = None
             profile.save()
         return user
+
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).exists():
             raise ValidationError("A user with this email already exists.")
         return email
+
 
 
 class EmailAuthenticationForm(AuthenticationForm):

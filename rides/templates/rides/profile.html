@@ -39,17 +39,12 @@
       <div class="trip-detail-wrapper">
         <h2>Car Ownership</h2>
 
-        <div class="car-ownership-group">
-  <label>
-    <input type="radio" name="has_car" value="True" {% if has_car %}checked{% endif %}>
-    Yes
-  </label>
-  <label>
-    <input type="radio" name="has_car" value="False" {% if not has_car %}checked{% endif %}>
-    No
-  </label>
-</div>
-
+        <!-- Usa el widget del form (radios Yes/No, siempre marca bien) -->
+        <div class="car-ownership-group has-car-group">
+          {{ pform.has_car.label_tag }}
+          {{ pform.has_car }}
+          {{ pform.has_car.errors }}
+        </div>
 
         <div id="car-fields" class="car-fields">
           <div class="form-row">
@@ -81,17 +76,17 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const radios   = document.querySelectorAll('input[name="has_car"]');
-      const carBox   = document.getElementById('car-fields');
+      const radios = document.querySelectorAll('input[name="has_car"]');
+      const carBox = document.getElementById('car-fields');
 
       function toggleCarFields() {
-        // choicefield devuelve "True" o "False"
+        // Value is "True" or "False" as string (from Django ChoiceField)
         const val = document.querySelector('input[name="has_car"]:checked').value;
         carBox.style.display = (val === 'True') ? 'block' : 'none';
       }
 
       radios.forEach(r => r.addEventListener('change', toggleCarFields));
-      toggleCarFields();
+      toggleCarFields(); // Run at load
     });
   </script>
 {% endblock %}

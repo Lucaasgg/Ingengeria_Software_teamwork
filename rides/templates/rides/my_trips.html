@@ -1,0 +1,56 @@
+{% extends "rides/base.html" %}
+{% block title %}My Trips{% endblock %}
+{% block content %}
+<h1 style="text-align:center;">My Trips (As Driver)</h1>
+{% for trip in trips %}
+<div class="trip-card">
+  <h2>Route: {{ trip.route }}</h2>
+  <p><b>Departure:</b> {{ trip.departure }}</p>
+  <p><b>Status:</b> {{ trip.get_status_display }}</p>
+  <p><b>Seats available:</b> {{ trip.seats_available }}</p>
+
+  {# Cambiado: namespace rides en la url #}
+  <form method="post" action="{% url 'rides:update-trip-status' trip.id %}" style="display:inline;">
+    {% csrf_token %}
+    <label for="status">Change status:</label>
+    <select name="status">
+        {% for value, label in trip.STATUS_CHOICES %}
+            <option value="{{ value }}" {% if trip.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Save</button>
+  </form>
+
+  <h4>Participation Requests:</h4>
+{% if trip.requests.all %}
+  <table>
+    <thead>
+      <tr>
+        <th>Passenger</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for req in trip.requests.all %}
+      <tr>
+        <td>{{ req.passenger.get_full_name }} ({{ req.passenger.email }})</td>
+        <td>{{ req.get_status_display }}</td>
+        <td>
+          {% if req.status == 'P' %}
+            <form method="post" action="{% url 'rides:manage-participation-request' req.id %}" style="display:inline;">{% csrf_token %}
+              <button name="action" value="accept" class="btn btn-sm">Accept</button>
+              <button name="action" value="reject" class="btn btn-sm">Reject</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No participation requests yet.</p>
+{% endif %}
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,4 +1,3 @@
-{# templates/rides/trip_list.html #}
 {% extends "rides/base.html" %}
 {% block title %}Available Trips{% endblock %}
 
@@ -11,7 +10,9 @@
         <div class="trip-card">
           <div class="trip-info">
             <h2>{{ trip.route.origin }} → {{ trip.route.destination }}</h2>
-            <p><strong>When:</strong> {{ trip.departure|date:"F j, Y, g:i a" }}</p>
+            <p><strong>Date:</strong> {{ trip.departure|date:"F j, Y, g:i a" }}</p>
+            <p><strong>Seats available:</strong> {{ trip.seats_available }}</p>
+            <p><strong>Driver:</strong> {{ trip.driver.get_full_name|default:trip.driver.username }}</p>
           </div>
           <a href="{% url 'rides:trip-detail' trip.pk %}" class="btn btn-request">
             Details
