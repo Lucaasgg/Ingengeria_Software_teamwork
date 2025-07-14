@@ -43,8 +43,8 @@
               <td>
                 {% if req.status == 'P' and trip.status == 'P' %}
                   <form method="post" action="{% url 'rides:manage-participation-request' req.id %}" style="display:inline;">{% csrf_token %}
-                    <button name="action" value="accept" class="btn btn-sm">Accept</button>
-                    <button name="action" value="reject" class="btn btn-sm">Reject</button>
+                    <button type="submit" name="action" value="accept" class="btn btn-sm">Accept</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-sm">Reject</button>
                   </form>
                 {% endif %}
               </td>

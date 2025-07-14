@@ -139,7 +139,7 @@ def create_trip(request):
             trip.driver = request.user
             trip.save()
             messages.success(request, "Trip created successfully!")
-            return redirect('rides:trip-list')  # Cambia según tu namespace
+            return redirect('rides:trip-list')  
     else:
         form = TripCreateForm()
 
@@ -165,74 +165,38 @@ def my_trips(request):
 @login_required
 def update_trip_status(request, trip_id):
     """
-    Allows the driver to update the status of a trip, and sends notifications to passengers.
-    Once a trip is marked as Completed or Aborted, it cannot be modified again.
+    Allows the driver to change the status of their trip,
+    and notifies all accepted passengers if the trip is completed or aborted.
+    Once a trip is 'Completed' or 'Aborted', it cannot be changed anymore.
     """
     trip = get_object_or_404(Trip, id=trip_id, driver=request.user)
 
-    # Do not allow editing if trip is already completed or aborted
+    # If already finalized, no changes allowed
     if trip.status in ['C', 'A']:
-        messages.error(request, "This trip cannot be modified anymore.")
+        messages.error(request, "You can't edit a trip that is completed or aborted.")
         return redirect('rides:my-trips')
 
     if request.method == 'POST':
         status = request.POST.get('status')
         if status in dict(Trip.STATUS_CHOICES):
-            trip.status = status
-            trip.save()
-            messages.success(request, "Trip status updated.")
+            if status != trip.status:
+                trip.status = status
+                trip.save()
+                messages.success(request, "Trip status updated.")
 
-            # Send notifications depending on the new status
-            if status == 'A':  # Aborted
-                # Notify all passengers (pending or accepted) that the trip is cancelled
-                for req in trip.requests.filter(status__in=['P', 'A']):
-                    Notification.objects.create(
-                        user=req.passenger,
-                        message=f"The trip {trip.route} has been cancelled."
-                    )
-                    # Optionally, mark their request as rejected
-                    req.status = 'R'
-                    req.save()
-            elif status == 'C':  # Completed
-                # Notify only accepted passengers that the trip is completed
-                for req in trip.requests.filter(status='A'):
-                    Notification.objects.create(
-                        user=req.passenger,
-                        message=f"The trip {trip.route} has been completed."
-                    )
-
+                # Only notify if changed to completed or aborted
+                if status in ['C', 'A']:
+                    # Notify all accepted passengers
+                    accepted_requests = trip.requests.filter(status='A')
+                    for req in accepted_requests:
+                        Notification.objects.create(
+                            user=req.passenger,
+                            message=f"Trip '{trip.route}' on {trip.departure.strftime('%Y-%m-%d %H:%M')} has been marked as {trip.get_status_display().lower()}."
+                        )
         else:
             messages.error(request, "Invalid status.")
     return redirect('rides:my-trips')
 
-@login_required
-def manage_participation_request(request, request_id):
-    req = get_object_or_404(
-        TripRequest,
-        id=request_id,
-        trip__driver=request.user
-    )
-    
-    if req.trip.status != 'P':
-        messages.error(request, "Cannot manage requests for completed/aborted trips.")
-        return redirect('rides:my-trips')
-
-    action = request.POST.get('action')
-    if action == 'accept' and req.status == 'P':
-        if req.trip.seats_available > 0:
-            req.status = 'A'
-            req.trip.seats_available -= 1
-            req.trip.save()
-            req.save()
-            messages.success(request, "Passenger accepted.")
-        else:
-            messages.error(request, "No seats available!")
-    elif action == 'reject' and req.status == 'P':
-        req.status = 'R'
-        req.save()
-        messages.success(request, "Passenger rejected.")
-
-    return redirect('rides:my-trips')
 
 @login_required
 def manage_participation_request(request, request_id):
@@ -286,6 +250,5 @@ def manage_participation_request(request, request_id):
 
 @login_required
 def notifications_view(request):
-    # Fetch notifications for the logged-in user
-    notifications = []  
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'rides/notifications.html', {'notifications': notifications})
