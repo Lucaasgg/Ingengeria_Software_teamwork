@@ -13,18 +13,18 @@
       <p><b>Departure:</b> {{ trip.departure }}</p>
       <p><b>Status:</b> {{ trip.get_status_display }}</p>
       <p><b>Seats available:</b> {{ trip.seats_available }}</p>
-      <!-- Cambiar estado del viaje -->
+      
       <form method="post" action="{% url 'rides:update-trip-status' trip.id %}" style="display:inline;">
-        {% csrf_token %}
-        <label for="status">Change status:</label>
-        <select name="status">
-          {% for value, label in trip.STATUS_CHOICES %}
+    {% csrf_token %}
+    <label for="status">Change status:</label>
+    <select name="status" {% if trip.status != 'P' %}disabled{% endif %}>
+        {% for value, label in trip.STATUS_CHOICES %}
             <option value="{{ value }}" {% if trip.status == value %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-        <button type="submit">Save</button>
-      </form>
-      <!-- Tabla de participation requests -->
+        {% endfor %}
+    </select>
+    <button type="submit" {% if trip.status != 'P' %}disabled{% endif %}>Save</button>
+    </form>
+      
       <h4>Participation Requests:</h4>
       {% if trip.requests.all %}
         <table>
@@ -41,9 +41,8 @@
               <td>{{ req.passenger.get_full_name }} ({{ req.passenger.email }})</td>
               <td>{{ req.get_status_display }}</td>
               <td>
-                {% if req.status == 'P' %}
-                  <form method="post" action="{% url 'rides:manage-participation-request' req.id %}" style="display:inline;">
-                    {% csrf_token %}
+                {% if req.status == 'P' and trip.status == 'P' %}
+                  <form method="post" action="{% url 'rides:manage-participation-request' req.id %}" style="display:inline;">{% csrf_token %}
                     <button name="action" value="accept" class="btn btn-sm">Accept</button>
                     <button name="action" value="reject" class="btn btn-sm">Reject</button>
                   </form>

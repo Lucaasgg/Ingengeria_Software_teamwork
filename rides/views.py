@@ -164,35 +164,60 @@ def my_trips(request):
 
 @login_required
 def update_trip_status(request, trip_id):
+    """
+    Allows the driver to update the status of a trip, and sends notifications to passengers.
+    Once a trip is marked as Completed or Aborted, it cannot be modified again.
+    """
     trip = get_object_or_404(Trip, id=trip_id, driver=request.user)
+
+    # Do not allow editing if trip is already completed or aborted
+    if trip.status in ['C', 'A']:
+        messages.error(request, "This trip cannot be modified anymore.")
+        return redirect('rides:my-trips')
+
     if request.method == 'POST':
         status = request.POST.get('status')
         if status in dict(Trip.STATUS_CHOICES):
             trip.status = status
             trip.save()
             messages.success(request, "Trip status updated.")
-            
-            if status == 'A':  # 'A' para Aborted
-                accepted_requests = trip.requests.filter(status='A')
-                for req in accepted_requests:
+
+            # Send notifications depending on the new status
+            if status == 'A':  # Aborted
+                # Notify all passengers (pending or accepted) that the trip is cancelled
+                for req in trip.requests.filter(status__in=['P', 'A']):
                     Notification.objects.create(
                         user=req.passenger,
                         message=f"The trip {trip.route} has been cancelled."
                     )
+                    # Optionally, mark their request as rejected
+                    req.status = 'R'
+                    req.save()
+            elif status == 'C':  # Completed
+                # Notify only accepted passengers that the trip is completed
+                for req in trip.requests.filter(status='A'):
+                    Notification.objects.create(
+                        user=req.passenger,
+                        message=f"The trip {trip.route} has been completed."
+                    )
+
         else:
             messages.error(request, "Invalid status.")
     return redirect('rides:my-trips')
-
 
 @login_required
 def manage_participation_request(request, request_id):
     req = get_object_or_404(
         TripRequest,
         id=request_id,
-        trip__driver=request.user  # Only the driver can manage
+        trip__driver=request.user
     )
-    action = request.POST.get('action')  # 'accept' or 'reject'
+    
+    if req.trip.status != 'P':
+        messages.error(request, "Cannot manage requests for completed/aborted trips.")
+        return redirect('rides:my-trips')
 
+    action = request.POST.get('action')
     if action == 'accept' and req.status == 'P':
         if req.trip.seats_available > 0:
             req.status = 'A'
@@ -200,26 +225,61 @@ def manage_participation_request(request, request_id):
             req.trip.save()
             req.save()
             messages.success(request, "Passenger accepted.")
-            # Notificación de aceptación
-            Notification.objects.create(
-                user=req.passenger,
-                message=f"Your request for trip {req.trip.route} has been accepted."
-            )
         else:
             messages.error(request, "No seats available!")
     elif action == 'reject' and req.status == 'P':
         req.status = 'R'
         req.save()
         messages.success(request, "Passenger rejected.")
-        # Notificación de rechazo
-        Notification.objects.create(
-            user=req.passenger,
-            message=f"Your request for trip {req.trip.route} has been rejected."
-        )
 
     return redirect('rides:my-trips')
 
 @login_required
-def notifications_view(request):
-    notifications = request.user.notifications.order_by('-created_at')
-    return render(request, 'rides/notifications.html', {'notifications': notifications})
+def manage_participation_request(request, request_id):
+    """
+    Allows the driver to accept or reject participation requests.
+    Sends a notification to the passenger about the result.
+    Also decreases seats_available if accepted.
+    """
+    req = get_object_or_404(
+        TripRequest,
+        id=request_id,
+        trip__driver=request.user  # Only the trip's driver can manage requests
+    )
+
+    action = request.POST.get('action')  # Should be 'accept' or 'reject'
+
+    # Do not allow modifying requests if the trip is completed or aborted
+    if req.trip.status in ['C', 'A']:
+        messages.error(request, "Cannot manage requests for completed or aborted trips.")
+        return redirect('rides:my-trips')
+
+
+
+    if action == 'accept' and req.status == 'P':
+        if req.trip.seats_available > 0:
+            req.status = 'A'
+            req.trip.seats_available -= 1
+            req.trip.save()
+            req.save()
+            # Send notification to the passenger
+            Notification.objects.create(
+                user=req.passenger,
+                message=f"Your request to join the trip {req.trip.route} has been accepted!"
+            )
+            messages.success(request, "Passenger accepted.")
+        else:
+            messages.error(request, "No seats available!")
+    elif action == 'reject' and req.status == 'P':
+        req.status = 'R'
+        req.save()
+        # Send notification to the passenger
+        Notification.objects.create(
+            user=req.passenger,
+            message=f"Your request to join the trip {req.trip.route} has been rejected."
+        )
+        messages.success(request, "Passenger rejected.")
+    else:
+        messages.error(request, "Invalid or already processed request.")
+
+    return redirect('rides:my-trips')

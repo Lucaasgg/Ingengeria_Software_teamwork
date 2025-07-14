@@ -1,20 +1,20 @@
-<div class="notifications-container">
-  <div class="notifications-title">Notifications</div>
+{% extends "rides/base.html" %}
+{% block title %}Notifications{% endblock %}
 
-  {% if notifications %}
-    <ul class="notification-list">
-      {% for n in notifications %}
-        <li class="notification-item {% if not n.is_read %}unread{% endif %}">
-          <div class="notification-message">{{ n.message }}</div>
-          <span class="notification-date">
-            {{ n.created_at|date:"Y-m-d H:i" }}
-          </span>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <div class="empty-notification">
-      No notifications yet.
-    </div>
-  {% endif %}
+{% block content %}
+<div class="notifications-container">
+    <div class="notifications-title">Notifications</div>
+    {% if notifications %}
+        <ul class="notification-list">
+            {% for n in notifications %}
+                <li class="notification-item {% if not n.is_read %}unread{% endif %}">
+                    <div class="notification-message">{{ n.message }}</div>
+                    <span class="notification-date">{{ n.created_at|date:"Y-m-d H:i" }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-notification">No notifications yet.</div>
+    {% endif %}
 </div>
+{% endblock %}
