@@ -852,3 +852,63 @@ input[type="radio"] {
     }
 }
 
+.notifications-container {
+    max-width: 600px;
+    margin: 40px auto 0 auto;
+    padding: 0 20px;
+}
+
+.notifications-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #25348b;
+}
+
+.notification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item {
+    background: #fff;
+    border-left: 5px solid #4e5bd7;
+    box-shadow: 0 2px 8px rgba(34, 53, 109, 0.08);
+    margin-bottom: 18px;
+    padding: 18px 22px 14px 18px;
+    border-radius: 8px;
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+
+.notification-item.unread {
+    background: #f2f6ff;
+    border-left: 5px solid #1b3adb;
+}
+
+.notification-message {
+    font-size: 1.09rem;
+    color: #232946;
+    margin-bottom: 4px;
+}
+
+.notification-date {
+    display: block;
+    color: #8791b8;
+    font-size: 0.97rem;
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+}
+
+.empty-notification {
+    background: #fffbe8;
+    border: 1.5px solid #e6d36a;
+    color: #a6881d;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    margin: 32px 0 0 0;
+    font-size: 1.11rem;
+}
