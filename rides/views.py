@@ -128,17 +128,28 @@ def create_trip(request):
         return redirect('profile')
 
     if request.method == 'POST':
-        form = TripCreateForm(request.POST, user=request.user)
+        form = TripCreateForm(request.POST)
         if form.is_valid():
             trip = form.save(commit=False)
-            #
+            trip.driver = request.user  # Assign the driver BEFORE saving!
+            
+            # Now do your validations:
+            car_seats = profile.seats or 0
+            if trip.seats_available >= car_seats:
+                messages.error(request, "You can't select more seats than your car allows (max: %d seats)" % (car_seats - 1))
+                return render(request, 'rides/trip_create.html', {'form': form})
+
+            if trip.departure <= timezone.now():
+                messages.error(request, "Departure must be in the future.")
+                return render(request, 'rides/trip_create.html', {'form': form})
+
             trip.save()
             messages.success(request, "Trip created successfully!")
-            return redirect('rides:trip-list')  
+            return redirect('rides:trip-list')
     else:
-        form = TripCreateForm(user=request.user)
-
+        form = TripCreateForm()
     return render(request, 'rides/trip_create.html', {'form': form})
+
 
 @login_required
 def my_trips(request):
