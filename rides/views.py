@@ -283,3 +283,9 @@ def manage_participation_request(request, request_id):
         messages.error(request, "Invalid or already processed request.")
 
     return redirect('rides:my-trips')
+
+@login_required
+def notifications_view(request):
+    # Fetch notifications for the logged-in user
+    notifications = []  
+    return render(request, 'rides/notifications.html', {'notifications': notifications})
