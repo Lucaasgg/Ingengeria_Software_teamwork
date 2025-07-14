@@ -39,23 +39,19 @@ class TripDetailView(DetailView):
     context_object_name = 'trip'
 
     def get_context_data(self, **kwargs):
-        ctx  = super().get_context_data(**kwargs)
+        ctx = super().get_context_data(**kwargs)
         user = self.request.user
-        ctx['already_requested'] = (
-            user.is_authenticated and
-            TripRequest.objects.filter(trip=self.object, passenger=user).exists()
-        )
+        ctx['already_requested'] = self.request.GET.get('already_requested') == '1'
+        ctx['seat_requested'] = self.request.GET.get('seat_requested') == '1'
         return ctx
 
 
 class TripRequestView(LoginRequiredMixin, View):
-    
-    login_url          = '/accounts/login/'
+    login_url = '/accounts/login/'
     redirect_field_name = 'next'
 
     def post(self, request, pk):
         trip = get_object_or_404(Trip, pk=pk, status='P')
-
         if trip.driver == request.user:
             messages.error(request, "You can’t request your own trip.")
             return redirect('rides:trip-detail', pk=pk)
@@ -67,11 +63,10 @@ class TripRequestView(LoginRequiredMixin, View):
         )
 
         if created:
-            messages.success(request, "Your request has been sent.")
+            
+            return redirect(f'/rides/trips/{pk}/?seat_requested=1')
         else:
-            messages.info(request, "You’ve already requested a seat on this trip.")
-
-        return redirect('rides:trip-detail', pk=pk)
+            return redirect(f'/rides/trips/{pk}/?already_requested=1')
 
 
 @login_required
@@ -133,15 +128,15 @@ def create_trip(request):
         return redirect('profile')
 
     if request.method == 'POST':
-        form = TripCreateForm(request.POST)
+        form = TripCreateForm(request.POST, user=request.user)
         if form.is_valid():
             trip = form.save(commit=False)
-            trip.driver = request.user
+            #
             trip.save()
             messages.success(request, "Trip created successfully!")
             return redirect('rides:trip-list')  
     else:
-        form = TripCreateForm()
+        form = TripCreateForm(user=request.user)
 
     return render(request, 'rides/trip_create.html', {'form': form})
 

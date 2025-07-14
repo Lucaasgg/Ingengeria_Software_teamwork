@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.forms import ValidationError
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -60,13 +61,18 @@ class Trip(models.Model):
         return f"Trip {self.id} by {self.driver} on {dt}"
 
     def clean(self):
-        from django.core.exceptions import ValidationError
-        if not self.driver_id:
-            return
+        # Ensure departure is in the future
         if self.departure <= timezone.now():
             raise ValidationError("Departure time must be in the future.")
-        if hasattr(self.driver, 'car') and self.seats_available > self.driver.car.seats:
-            raise ValidationError("Seats available exceed your car's capacity.")
+
+        # Ensure driver has a car with a seat count
+        if hasattr(self.driver, 'profile') and self.driver.profile.has_car:
+            max_seats = self.driver.profile.seats or 1
+            # Only allow seats less than car capacity (driver occupies a seat)
+            if self.seats_available > max_seats - 1:
+                raise ValidationError(f"Seats available cannot exceed your car's capacity minus one (max {max_seats-1}).")
+        else:
+            raise ValidationError("Driver does not have a registered car.")
 
 class TripRequest(models.Model):
     STATUS_CHOICES = [

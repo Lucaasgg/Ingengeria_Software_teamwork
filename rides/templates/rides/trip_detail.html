@@ -37,14 +37,31 @@
       <a href="{% url 'rides:trip-list' %}" class="btn btn-secondary">← Back to Trips</a>
     </div>
   </div>
+
+  {# Modal Overlay for notifications #}
+  <div id="modalOverlay" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:rgba(20,20,70,.25);align-items:center;justify-content:center;">
+    <div style="background:white;padding:2.5em 2em;border-radius:16px;max-width:90vw;box-shadow:0 6px 28px #4442;">
+      <h3 id="modalTitle" style="margin-top:0;"></h3>
+      <p id="modalMessage"></p>
+      <button id="modalClose" class="btn">OK</button>
+    </div>
+  </div>
 {% endblock %}
+
 {% block extra_js %}
-  {% if already_requested %}
+  {% if seat_requested or already_requested %}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const overlay = document.getElementById('modalOverlay');
-        document.getElementById('modalTitle').textContent   = 'Already Requested';
-        document.getElementById('modalMessage').textContent = "You've already requested a seat on this trip.";
+        const title   = document.getElementById('modalTitle');
+        const msg     = document.getElementById('modalMessage');
+        {% if already_requested %}
+          title.textContent = "Already Requested";
+          msg.textContent   = "You've already requested a seat on this trip.";
+        {% elif seat_requested %}
+          title.textContent = "Seat Requested";
+          msg.textContent   = "Seat requested successfully!";
+        {% endif %}
         overlay.style.display = 'flex';
         document.getElementById('modalClose').addEventListener('click', function() {
           overlay.style.display = 'none';

@@ -125,8 +125,38 @@ class EmailAuthenticationForm(AuthenticationForm):
 class TripCreateForm(forms.ModelForm):
     class Meta:
         model = Trip
-        exclude = ['driver', 'status', 'created_at']
-        fields = ['route', 'departure', 'seats_available']  
+        fields = ['route', 'departure', 'seats_available']
         widgets = {
             'departure': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        trip = super().save(commit=False)
+        if self.user:
+            trip.driver = self.user
+        if commit:
+            trip.save()
+        return trip
+
+    def clean_seats_available(self):
+        seats = self.cleaned_data.get('seats_available')
+        if self.user and hasattr(self.user, 'profile') and self.user.profile.has_car:
+            car_seats = self.user.profile.seats
+            if seats is not None and car_seats is not None:
+                max_seats = max(1, car_seats - 1)  # At least 1 seat
+                if seats > max_seats:
+                    raise forms.ValidationError(
+                        f"You can't offer more than {max_seats} seats (your car has {car_seats} seats, one is reserved for the driver)."
+                    )
+        return seats
+
+    def clean_departure(self):
+        dep = self.cleaned_data.get('departure')
+        from django.utils import timezone
+        if dep and dep <= timezone.now():
+            raise forms.ValidationError("The trip date must be in the future.")
+        return dep
