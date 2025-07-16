@@ -1,24 +1,73 @@
 {% extends "rides/base.html" %}
 {% block title %}Create Trip{% endblock %}
+
 {% block content %}
   <div class="create-trip-container">
-  <h1>Create a Trip</h1>
-  <form method="post" class="create-trip-form">
-    {% csrf_token %}
-    <div class="trip-form-row">
-      <label for="{{ form.route.id_for_label }}">Route:</label>
-      {{ form.route }}
-    </div>
-    <div class="trip-form-row">
-      <label for="{{ form.departure.id_for_label }}">Departure:</label>
-      {{ form.departure }}
-    </div>
-    <div class="trip-form-row">
-      <label for="{{ form.seats_available.id_for_label }}">Seats available:</label>
-      {{ form.seats_available }}
-    </div>
-    <button type="submit" class="create-trip-btn">Create Trip</button>
-  </form>
-</div>
+    <h1>Create a Trip</h1>
+    
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert 
+            {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
 
+    
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        <ul>
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" class="create-trip-form" novalidate>
+      {% csrf_token %}
+
+      <div class="trip-form-row">
+        <label for="{{ form.route.id_for_label }}">Route:</label>
+        {{ form.route }}
+        {% if form.route.errors %}
+          <div class="form-error">
+            {{ form.route.errors|join:", " }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="trip-form-row">
+        <label for="{{ form.departure.id_for_label }}">Departure:</label>
+        {{ form.departure }}
+        {% if form.departure.errors %}
+          <div class="form-error">
+            {{ form.departure.errors|join:", " }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="trip-form-row">
+        <label for="{{ form.seats_available.id_for_label }}">Seats available:</label>
+        {{ form.seats_available }}
+        {% if form.seats_available.errors %}
+          <div class="form-error">
+            {{ form.seats_available.errors|join:", " }}
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="create-trip-btn">Create Trip</button>
+    </form>
+  </div>
+
+  <style>
+    .alert { margin: 10px 0; padding: 10px; border-radius: 4px; }
+    .alert-success { background: #e7f9ef; color: #247c42; }
+    .alert-danger { background: #fdecea; color: #a94442; }
+    .alert-info { background: #e6f0fa; color: #175aa6; }
+    .form-error { color: #a94442; font-size: 0.93em; margin-top: 2px; }
+  </style>
 {% endblock %}

@@ -59,21 +59,12 @@ class Trip(models.Model):
     def __str__(self):
         dt = self.departure.strftime('%Y-%m-%d %H:%M')
         return f"Trip {self.id} by {self.driver} on {dt}"
+    
+    
+ 
+    
 
-    def clean(self):
-        # Ensure departure is in the future
-        if self.departure <= timezone.now():
-            raise ValidationError("Departure time must be in the future.")
-
-        # Ensure driver has a car with a seat count
-        if hasattr(self.driver, 'profile') and self.driver.profile.has_car:
-            max_seats = self.driver.profile.seats or 1
-            # Only allow seats less than car capacity (driver occupies a seat)
-            if self.seats_available > max_seats - 1:
-                raise ValidationError(f"Seats available cannot exceed your car's capacity minus one (max {max_seats-1}).")
-        else:
-            raise ValidationError("Driver does not have a registered car.")
-
+        
 class TripRequest(models.Model):
     STATUS_CHOICES = [
         ('P', 'Pending'),

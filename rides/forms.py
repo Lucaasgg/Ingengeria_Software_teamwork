@@ -1,4 +1,5 @@
 # rides/forms.py
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib.auth import get_user_model
@@ -142,21 +143,27 @@ class TripCreateForm(forms.ModelForm):
             trip.save()
         return trip
 
-    def clean_seats_available(self):
-        seats = self.cleaned_data.get('seats_available')
-        if self.user and hasattr(self.user, 'profile') and self.user.profile.has_car:
-            car_seats = self.user.profile.seats
-            if seats is not None and car_seats is not None:
-                max_seats = max(1, car_seats - 1)  # At least 1 seat
-                if seats > max_seats:
-                    raise forms.ValidationError(
-                        f"You can't offer more than {max_seats} seats (your car has {car_seats} seats, one is reserved for the driver)."
-                    )
-        return seats
+    def clean(self):
+        cleaned = super().clean()
+        errors = {}
 
-    def clean_departure(self):
-        dep = self.cleaned_data.get('departure')
-        from django.utils import timezone
-        if dep and dep <= timezone.now():
-            raise forms.ValidationError("The trip date must be in the future.")
-        return dep
+        departure = cleaned.get('departure')
+        seats = cleaned.get('seats_available')
+        user = self.user
+
+        # Validate departure in future
+        if departure and departure <= timezone.now():
+            errors['departure'] = "Departure time must be in the future."
+
+        # Validate seats vs car
+        if user and hasattr(user, 'profile') and user.profile.has_car:
+            max_seats = user.profile.seats or 1
+            if seats is not None and seats > max_seats - 1:
+                errors['seats_available'] = f"Seats cannot exceed your car's capacity."
+        else:
+            errors['seats_available'] = "You must have a registered car with valid seat number."
+
+        if errors:
+            raise ValidationError(errors)
+
+        return cleaned
