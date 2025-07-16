@@ -15,5 +15,3 @@ db.sqlite3
 .DS_Store
 
 .pytest_cache
-
-pytest.ini
