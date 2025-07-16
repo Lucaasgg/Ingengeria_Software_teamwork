@@ -12,8 +12,8 @@ User = settings.AUTH_USER_MODEL
 class City(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=12, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=12, decimal_places=6, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -32,14 +32,16 @@ class Car(models.Model):
     def __str__(self):
         return f"{self.make} {self.model} ({self.plate})"
 
+
 class Route(models.Model):
-    origin = models.CharField(max_length=100)
-    destination = models.CharField(max_length=100)
-    distance_km = models.DecimalField(max_digits=6, decimal_places=2)
-    avg_time_minutes = models.PositiveIntegerField()
+    origin = models.ForeignKey(City, related_name='routes_origin', on_delete=models.CASCADE)
+    destination = models.ForeignKey(City, related_name='routes_destination', on_delete=models.CASCADE)
+    distance_km = models.PositiveIntegerField()
+    avg_time_minutes = models.PositiveIntegerField(verbose_name="Average time (minutes)", null=True, blank=True)
 
     def __str__(self):
         return f"{self.origin} → {self.destination}"
+
 
 class Trip(models.Model):
     STATUS_CHOICES = [
