@@ -1,0 +1,34 @@
+@startuml create_trip_sequence   ← give your diagram a name!
+actor Driver
+participant CreateView   as "create_trip View"
+participant Form         as "TripCreateForm"
+participant TripModel    as "Trip (Model)"
+participant DB           as "Database"
+
+' GET the empty form
+Driver -> CreateView : GET /rides/trips/create/
+activate CreateView
+CreateView --> Driver : 200 OK + trip_create.html
+deactivate CreateView
+
+' POST form data
+Driver -> CreateView : POST /rides/trips/create/
+activate CreateView
+CreateView -> Form : TripCreateForm(request.POST, user)
+activate Form
+Form --> Form : clean()
+Form --> CreateView : is_valid == true
+deactivate Form
+
+' Save the model
+CreateView -> TripModel : save(commit=False)
+activate TripModel
+TripModel --> TripModel : assign driver
+TripModel -> DB : INSERT INTO rides_trip
+DB --> TripModel : OK
+deactivate TripModel
+
+' Redirect back to list
+CreateView --> Driver : HTTP 302 Redirect /rides/trips/
+deactivate CreateView
+@enduml
