@@ -1,0 +1,42 @@
+@startuml UseCaseUML
+left to right direction
+skinparam packageStyle rectangle
+
+actor Visitor
+actor "Standard User" as SU
+actor Administrator
+
+rectangle "Carpooling System" {
+  usecase "Register / Login"            as UC01
+  usecase "Edit Profile & Vehicle"      as UC02
+  usecase "Create Trip"                 as UC03
+  usecase "View Trip Details"           as UC04
+  usecase "Request Seat"                as UC05
+  usecase "Manage Trip Requests"        as UC06
+  usecase "View My Trips"               as UC07
+  usecase "View My Requests"            as UC08
+  usecase "Update Trip Status"          as UC09
+  usecase "View Notifications"          as UC10
+  usecase "Add Authorized Route"        as UC11
+  usecase "Manage Authorized Routes"    as UC12
+  usecase "Manage Cities"               as UC13
+  usecase "Moderate Trip Offers"        as UC14
+  usecase "Deactivate User"             as UC15
+}
+
+Visitor      --> UC01
+SU           --> UC02
+SU           --> UC03
+SU           --> UC04
+SU           --> UC05
+SU           --> UC06
+SU           --> UC07
+SU           --> UC08
+SU           --> UC09
+SU           --> UC10
+Administrator --> UC11
+Administrator --> UC12
+Administrator --> UC13
+Administrator --> UC14
+Administrator --> UC15
+@enduml

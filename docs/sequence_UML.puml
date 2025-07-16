@@ -1,4 +1,4 @@
-@startuml create_trip_sequence   ← give your diagram a name!
+@startuml create_trip_sequence  
 actor Driver
 participant CreateView   as "create_trip View"
 participant Form         as "TripCreateForm"
