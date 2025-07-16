@@ -159,7 +159,7 @@ class TripCreateForm(forms.ModelForm):
         if user and hasattr(user, 'profile') and user.profile.has_car:
             max_seats = user.profile.seats or 1
             if seats is not None and seats > max_seats - 1:
-                errors['seats_available'] = f"Seats cannot exceed your car's capacity."
+                errors['seats_available'] = f"Seats cannot exceed your car's capacity -1."
         else:
             errors['seats_available'] = "You must have a registered car with valid seat number."
 
