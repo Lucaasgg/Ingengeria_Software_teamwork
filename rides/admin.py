@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from .models import Car, Route, Trip, TripRequest
+from .models import Car, Route, Trip, TripRequest, City
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
@@ -23,3 +23,8 @@ class TripRequestAdmin(admin.ModelAdmin):
     list_display = ('trip', 'passenger', 'status', 'requested_at')
     list_filter = ('status',)
     search_fields = ('passenger__username',)
+    
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'address', 'latitude', 'longitude')
+    search_fields = ('name', 'address')
